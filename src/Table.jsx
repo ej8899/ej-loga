@@ -7,6 +7,9 @@ import { Table } from 'flowbite-react';
 
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
+// TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
+// TODO - log message remove the [EJCA]
+
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
 
@@ -50,6 +53,11 @@ export default function Ourdata() {
     return value;
   };
 
+  const cleanLogMessage = (logMessage) => {
+    const cleanedMessage = logMessage.replace("[EJCA]", "");
+    return cleanedMessage;
+  }
+
   return (
     <div className="overflow-x-auto">
       {jsonData ? (
@@ -72,7 +80,7 @@ export default function Ourdata() {
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {row.date}
                 </Table.Cell>
-                <Table.Cell>{row.log}</Table.Cell>
+                <Table.Cell>{cleanLogMessage(row.log)}</Table.Cell>
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
                 <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
                 <Table.Cell>
