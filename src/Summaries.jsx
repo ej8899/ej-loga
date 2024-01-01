@@ -2,10 +2,14 @@
 'use client';
 
 import { Card } from 'flowbite-react';
+import TrafficChart from './TrafficChart';
 
 export default function Summaries() {
   return (
     <div className="flex justify-end space-x-4">
+
+      <TrafficChart/>
+
       <Card href="#" className="max-w-sm">
         <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           Unique Visitors

@@ -5,7 +5,13 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [import("preline/plugin"), import("flowbite/plugin")],
+  plugins: [
+    import("preline/plugin"), 
+    import("flowbite/plugin"),
+    import('flowbite/plugin')({
+      charts: true,
+    }),
+  ],
 }
 
 
