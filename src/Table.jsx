@@ -88,7 +88,7 @@ export default function Ourdata() {
                     href="#"
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
-                    Edit
+                    delete
                   </a>
                 </Table.Cell>
               </Table.Row>
