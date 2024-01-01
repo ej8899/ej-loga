@@ -2,6 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 
+import { Spinner } from 'flowbite-react';
 import { Table } from 'flowbite-react';
 
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
@@ -63,7 +64,7 @@ export default function Ourdata() {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {Object.values(jsonData).map((row, rowIndex) => (
+            {jsonData.slice().reverse().map((row, rowIndex) => (
               <Table.Row
                 key={rowIndex}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -87,7 +88,11 @@ export default function Ourdata() {
           </Table.Body>
         </Table>
       ) : (
-        <p>Loading...</p>
+        <div className="text-center">
+          <Spinner aria-label="Loading log data..." size="xl" />
+          <br />
+          Loading Data...
+        </div>
       )}
     </div>
   );
