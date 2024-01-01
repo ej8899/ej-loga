@@ -8,7 +8,7 @@ import { Table } from 'flowbite-react';
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 // TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
-// TODO - log message remove the [EJCA]
+
 
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
@@ -33,7 +33,7 @@ export default function Ourdata() {
     };
 
     fetchData();
-  }, []); // Empty dependency array means this effect runs once when the component mounts
+  }, []);
 
   const truncateUserId = (userId) => {
     const maxLength = 10;
