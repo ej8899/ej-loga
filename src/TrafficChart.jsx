@@ -1,6 +1,7 @@
 
 'use client';
 import  { useState, useEffect } from 'react';
+import { Card } from 'flowbite-react';
 import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
@@ -106,7 +107,7 @@ export default function TrafficChart() {
   }, []);
 
   return (
-    <div className="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+    <Card href="#" className="max-w-sm">
   
     <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
@@ -200,6 +201,6 @@ export default function TrafficChart() {
         </a>
       </div>
     </div>
-  </div>
+  </Card>
   );
 }
