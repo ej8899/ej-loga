@@ -1,17 +1,110 @@
 
 'use client';
-import React, { useState, useEffect } from 'react';
-
-import { Spinner } from 'flowbite-react';
-import { Table } from 'flowbite-react';
-
+import  { useState, useEffect } from 'react';
+import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
-
-// TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
 
 
 export default function TrafficChart() {
-  
+  const [chartData, setChartData] = useState({
+    series: [0],
+    colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
+    options: {
+      chart: {
+        height: 320,
+        width: "100%",
+        type: "donut",
+      },
+      // outline colors
+      stroke: {
+        colors: ["transparent"],
+        lineCap: "",
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: "60%",
+            stroke: null,
+            // inner circle labels
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontFamily: "Inter, sans-serif",
+                offsetY: 0,
+              },
+              total: {
+                showAlways: true,
+                show: true,
+                label: "Uniques:",
+                fontFamily: "Inter, sans-serif",
+                color: "#1C64F2",
+                
+                formatter: function (w) {
+                  const sum = w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b
+                  }, 0)
+                  return `${sum}k`
+                },
+              },
+              value: {
+                show: true,
+                fontFamily: "Inter, sans-serif",
+                color: "#1C64F2",
+                offsetY:5,
+                formatter: function (value) {
+                  return value + "a"
+                },
+              },
+            },
+          },
+        },
+      },
+      grid: {
+        padding: {
+          top: -2,
+        },
+      },
+      labels: ["iPad", "iPhone", "Desktop", "Other"],
+      legend: {
+        position: "bottom",
+        fontFamily: "Inter, sans-serif",
+        color: '#1C64F2',
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            return value + "k"
+          },
+        },
+      },
+      xaxis: {
+        labels: {
+          formatter: function (value) {
+            return value  + "k"
+          },
+        },
+        axisTicks: {
+          show: false,
+        },
+        axisBorder: {
+          show: false,
+        },
+      },
+    },
+  });
+
+
+
+  useEffect(() => {
+    // TODO fetch our summary data and update here
+    const newSeries = [40, 50, 30, 10];
+    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
+  }, []);
+
   return (
     <div className="max-w-sm w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
   
@@ -63,8 +156,7 @@ export default function TrafficChart() {
       </div>
     </div>
   
-    
-    <div className="py-6" id="donut-chart"></div>
+    <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
   
     <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
       <div className="flex justify-between items-center pt-5">
