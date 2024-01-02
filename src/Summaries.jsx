@@ -9,7 +9,7 @@ export default function Summaries() {
   return (
     <div className="flex justify-end space-x-4">
 
-      <Card href="#" className="max-w-sm">
+      <Card className="max-w-sm">
         <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           Visits/Day (last 30 days)
         </h5>
