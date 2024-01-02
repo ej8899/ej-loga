@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { Spinner } from 'flowbite-react';
 import { Table } from 'flowbite-react';
 
+import logger from './logger';
+
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 // TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
@@ -27,8 +29,10 @@ export default function Ourdata() {
         const data = await response.json();
         setJsonData(data);
         console.log("SAMPLE:",data[0])
+        logger.info('(loga) fetched data');
       } catch (error) {
         console.error("Error fetching data:", error.message);
+        logger.error('(loga) error fetching data');
       }
     };
 
@@ -54,8 +58,12 @@ export default function Ourdata() {
   };
 
   const cleanLogMessage = (logMessage) => {
-    const cleanedMessage = logMessage.replace("[EJCA]", "");
-    return cleanedMessage;
+    if (logMessage.includes('[ERROR]')) {
+      const cleanedMessage = `<span class='text-red-500'>${logMessage}</span>`;
+      return cleanedMessage;
+    } else {
+      return logMessage;
+    }
   }
 
   return (
@@ -80,7 +88,7 @@ export default function Ourdata() {
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {row.date}
                 </Table.Cell>
-                <Table.Cell>{cleanLogMessage(row.log)}</Table.Cell>
+                <Table.Cell dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} />
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
                 <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
                 <Table.Cell>
