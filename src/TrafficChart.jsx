@@ -11,6 +11,10 @@ export default function TrafficChart() {
     series: [0],
     colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
     options: {
+      tooltip: {
+        enabled: true,
+        fillSeriesColor: false,
+      },
       chart: {
         height: 320,
         width: "100%",
@@ -31,14 +35,14 @@ export default function TrafficChart() {
               show: true,
               name: {
                 show: true,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 offsetY: 0,
               },
               total: {
                 showAlways: true,
                 show: true,
                 label: "Uniques:",
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 color: "#1C64F2",
                 
                 formatter: function (w) {
@@ -50,7 +54,7 @@ export default function TrafficChart() {
               },
               value: {
                 show: true,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 color: "#1C64F2",
                 offsetY:5,
                 formatter: function (value) {
@@ -69,23 +73,26 @@ export default function TrafficChart() {
       labels: ["iPad", "iPhone", "Desktop", "Other"],
       legend: {
         position: "bottom",
-        fontFamily: "Inter, sans-serif",
-        color: '#1C64F2',
+        fontFamily: "Poppins, sans-serif",
+        labels: {
+          colors: "#FDBA8C",
+        }
       },
       dataLabels: {
         enabled: false,
       },
       yaxis: {
         labels: {
+          colors: "#FDBA8C",
           formatter: function (value) {
-            return value + "k"
+            return value + "ka"
           },
         },
       },
       xaxis: {
         labels: {
           formatter: function (value) {
-            return value  + "k"
+            return value  + "B"
           },
         },
         axisTicks: {
@@ -138,23 +145,6 @@ export default function TrafficChart() {
               <div className="tooltip-arrow" data-popper-arrow></div>
           </div>
         </div>
-    </div>
-  
-    <div>
-      <div className="flex" id="devices">
-        <div className="flex items-center me-4">
-            <input id="desktop" type="checkbox" value="desktop" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-            <label htmlFor="desktop" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Desktop</label>
-        </div>
-        <div className="flex items-center me-4">
-            <input id="tablet" type="checkbox" value="tablet" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-            <label htmlFor="tablet" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tablet</label>
-        </div>
-        <div className="flex items-center me-4">
-            <input id="mobile" type="checkbox" value="mobile" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-            <label htmlFor="mobile" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mobile</label>
-        </div>
-      </div>
     </div>
   
     <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
