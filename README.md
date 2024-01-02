@@ -6,3 +6,7 @@ basic log analaysis for erniejohnson.ca - stand alone application for reviewing 
 Vite
 Tailwind CSS
 Flowbite UI library
+
+Charts by Apexcharts & Flowbite integration
+https://apexcharts.com/docs/options/plotoptions/pie/#labels
+https://flowbite.com/docs/plugins/charts/
