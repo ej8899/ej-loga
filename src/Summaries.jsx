@@ -17,11 +17,17 @@ export default function Summaries() {
         <p className="font-normal text-gray-700 dark:text-gray-400">
           loreum ipsum dolor sit amet, consectetur adipisicing elit.
         </p>
+        <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          Repeat Visitors
+        </h5>
+        <p className="font-normal text-gray-700 dark:text-gray-400">
+          loreum ipsum dolor sit amet, consectetur adipisicing elit.
+        </p>
       </Card>
 
       <Card href="#" className="max-w-sm">
       <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        Average time spent on site
+        Visits/Day (last 30 days)
       </h5>
       <p className="font-normal text-gray-700 dark:text-gray-400">
         loreum ipsum dolor sit amet, consectetur adipisicing elit.
