@@ -31,7 +31,7 @@ export default function Ourdata() {
         }
         
         const data = await response.json();
-        setJsonData(data);
+        setJsonData(data.reverse());
         console.log("SAMPLE:",data[0])
         logger.info('(loga) fetched data');
       } catch (error) {
@@ -136,7 +136,7 @@ export default function Ourdata() {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {filteredData.slice().reverse().map((row, rowIndex) => (
+            {filteredData.slice().map((row, rowIndex) => (
               <Table.Row
                 key={rowIndex}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
