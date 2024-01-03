@@ -12,3 +12,6 @@ Flowbite UI library
 Charts by Apexcharts & Flowbite integration
 https://apexcharts.com/docs/options/plotoptions/pie/#labels
 https://flowbite.com/docs/plugins/charts/
+
+Icons by Flowbite
+https://flowbite.com/icons/
