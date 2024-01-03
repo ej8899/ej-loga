@@ -1,10 +1,10 @@
 
 'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { Spinner } from 'flowbite-react';
 import { Table } from 'flowbite-react';
-import { Label, Select } from 'flowbite-react';
+import { Label,  } from 'flowbite-react';
 
 import logger from './logger';
 
