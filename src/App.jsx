@@ -6,6 +6,7 @@ import Summaries from './Summaries';
 import Ourdata from './Table'
 import { Flowbite } from 'flowbite-react';
 import logger from './logger';
+import ScrollToTopButton from './ScrollTop';
 
 
 const generateUUID = () => {
@@ -50,6 +51,7 @@ function App() {
         <div className="h-10"></div>
         <Ourfooter/>
       </div>
+      <ScrollToTopButton/>
     </Flowbite>
   )
 }
