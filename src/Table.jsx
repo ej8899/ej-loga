@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Spinner } from 'flowbite-react';
 import { Table } from 'flowbite-react';
+import { Label, Select } from 'flowbite-react';
 
 import logger from './logger';
 
@@ -14,6 +15,9 @@ import logger from './logger';
 
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
+  const [selectedMessageType, setSelectedMessageType] = useState('all');
+  const [visibleItems, setVisibleItems] = useState(20); // Initial number of items to display
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +42,38 @@ export default function Ourdata() {
 
     fetchData();
   }, []);
+
+  const handleLoadMore = () => {
+    // Increase visible items by 20 on each "Load More" click
+    setVisibleItems((prevVisibleItems) => prevVisibleItems + 20);
+  };
+
+  const handleMessageTypeChange = (event) => {
+    console.log("event.target.value:", event.target.value);
+    setSelectedMessageType(event.target.value);
+  };
+
+  const filteredData = jsonData
+  ? selectedMessageType === 'all'
+    ? jsonData.slice(0, visibleItems)
+    : jsonData.filter((row) => {
+        if (selectedMessageType === 'error') {
+          return row.log.includes('[ERROR]');
+        } else if (selectedMessageType === 'warning') {
+          return row.log.includes('[WARN]');
+        } else if (selectedMessageType === 'trace') {
+          return row.log.includes('[TRACE]');
+        } else if (selectedMessageType === 'debug') {
+          return row.log.includes('[DEBUG]');
+        } else if (selectedMessageType === 'info') {
+          return row.log.includes('[INFO]');
+        } else if (selectedMessageType === 'fatal') {
+          return row.log.includes('[FATAL]');
+        }
+        return false;
+      })
+      .slice(0,visibleItems)
+  : [];
 
   const truncateUserId = (userId) => {
     const maxLength = 10;
@@ -68,9 +104,29 @@ export default function Ourdata() {
 
   return (
     <div className="overflow-x-auto">
+      
+      <div className="mb-4">
+        <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
+        <select
+          id="messageType"
+          value={selectedMessageType}
+          onChange={handleMessageTypeChange}
+          className="p-2 border rounded"
+        >
+          <option value="all">All</option>
+          <option value="fatal">Fatal Errors</option>
+          <option value="error">Error</option>
+          <option value="warning">Warnings</option>
+          <option value="trace">Traces</option>
+          <option value="debug">Debug Messages</option>
+          <option value="info">Info Messages</option>
+        </select>
+      </div>
+
       {jsonData ? (
+        filteredData.length > 0 ? (
         <Table hoverable>
-          <Table.Head>
+          <Table.Head className='bg-slate-500 dark:bg-gray-800'>
             <Table.HeadCell>Date</Table.HeadCell>
             <Table.HeadCell>Log Message</Table.HeadCell>
             <Table.HeadCell>User ID</Table.HeadCell>
@@ -80,7 +136,7 @@ export default function Ourdata() {
             </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
-            {jsonData.slice().reverse().map((row, rowIndex) => (
+            {filteredData.slice().reverse().map((row, rowIndex) => (
               <Table.Row
                 key={rowIndex}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -103,11 +159,27 @@ export default function Ourdata() {
             ))}
           </Table.Body>
         </Table>
+        ) : (
+          <div className="text-center">
+            <p>No matching data found.</p>
+          </div>
+        )
       ) : (
         <div className="text-center">
           <Spinner aria-label="Loading log data..." size="xl" />
           <br />
           Loading Data...
+        </div>
+      )}
+
+      {jsonData && filteredData.length < jsonData.length && (
+        <div className="text-center mt-4">
+          <button
+            onClick={handleLoadMore}
+            className="p-2 rounded bg-blue-500 text-white"
+          >
+            Load More...
+          </button>
         </div>
       )}
     </div>
