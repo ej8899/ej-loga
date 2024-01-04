@@ -127,6 +127,9 @@ export default function Ourdata() {
     if (logMessage.includes('[ERROR]')) {
       const cleanedMessage = `<span class='text-red-500'>${logMessage}</span>`;
       return cleanedMessage;
+    } else if (logMessage.includes('[WARN]')) {
+      const cleanedMessage = `<span class='text-orange-500'>${logMessage}</span>`;
+      return cleanedMessage;
     } else {
       return logMessage;
     }
