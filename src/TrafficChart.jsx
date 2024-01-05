@@ -1,7 +1,6 @@
 
 'use client';
 import  { useState, useEffect } from 'react';
-import { Card } from 'flowbite-react';
 import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 

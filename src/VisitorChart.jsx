@@ -1,7 +1,6 @@
 
 'use client';
 import  { useState, useEffect } from 'react';
-import { Card } from 'flowbite-react';
 import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
@@ -100,7 +99,7 @@ export default function VisitorChart() {
   useEffect(() => {
     // TODO fetch our summary data and update here
     const newSeries = [40, 50, 30, 10];
-    //setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
+    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
   }, []);
 
   return (
