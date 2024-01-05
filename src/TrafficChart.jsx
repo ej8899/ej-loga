@@ -7,9 +7,10 @@ import Chart from 'react-apexcharts'
 
 export default function TrafficChart() {
   const [chartData, setChartData] = useState({
-    series: [0],
-    colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
+    series: [0,1,2,3],
+    
     options: {
+      colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
       tooltip: {
         enabled: true,
         fillSeriesColor: false,

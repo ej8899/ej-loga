@@ -9,7 +9,7 @@ export default function VisitorChart() {
   const [chartData, setChartData] = useState({
     series: [{
       name: 'visitors',
-      data: [31, 40, 28, 51, 42, 109, 100]
+      data: [1, 2, 1, 2, 1, 2, 1]
     }
     ],
     options: {
@@ -98,7 +98,12 @@ export default function VisitorChart() {
 
   useEffect(() => {
     // TODO fetch our summary data and update here
-    const newSeries = [40, 50, 30, 10];
+    // const newSeries = [40, 50, 30, 10];
+    const newSeries = [{
+      name: 'visitors',
+      data: [2, 27, 30, 10, 50, 23, 40]
+    }
+    ];
     setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
   }, []);
 
