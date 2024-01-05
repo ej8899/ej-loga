@@ -1,9 +1,9 @@
 
 'use client';
 
-import { Card } from 'flowbite-react';
 import TrafficChart from './TrafficChart';
 import VisitorChart from './VisitorChart';
+import ServerChart from './ServerChart';
 
 export default function Summaries() {
   return (
@@ -18,6 +18,7 @@ export default function Summaries() {
         </p>
       </div>
       
+      <ServerChart/>
 
       <TrafficChart/>
 
