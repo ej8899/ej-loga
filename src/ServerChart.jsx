@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 
 'use client';
 import  { useState, useEffect } from 'react';
@@ -5,11 +6,12 @@ import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
-export default function TrafficChart() {
+export default function ServerChart({data}) {
   const [chartData, setChartData] = useState({
-    series: [1,2],
-    colors: ["#1C64F2", "#16BDCA", ],
+    series: [0,1,],
+    
     options: {
+      // colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694","teal","orange"],
       tooltip: {
         enabled: true,
         fillSeriesColor: false,
@@ -17,19 +19,51 @@ export default function TrafficChart() {
       chart: {
         height: 320,
         width: "100%",
-        type: "radialBar",
+        type: "donut",
       },
       // outline colors
       stroke: {
         colors: ["transparent"],
-        lineCap: "round",
+        lineCap: "",
       },
       plotOptions: {
-        radialBar: {
-          hollow: {
-            margin: 15,
-            size: "40%",
-          }
+        pie: {
+          donut: {
+            size: "60%",
+            stroke: null,
+            // inner circle labels
+            labels: {
+              show: true,
+              name: {
+                show: true,
+                fontFamily: "Poppins, sans-serif",
+                offsetY: 0,
+              },
+              total: {
+                showAlways: true,
+                show: true,
+                label: "total:",
+                fontFamily: "Poppins, sans-serif",
+                color: "#1C64F2",
+                
+                formatter: function (w) {
+                  const sum = w.globals.seriesTotals.reduce((a, b) => {
+                    return a + b
+                  }, 0)
+                  return `${sum}`
+                },
+              },
+              value: {
+                show: true,
+                fontFamily: "Poppins, sans-serif",
+                color: "#1C64F2",
+                offsetY:5,
+                formatter: function (value) {
+                  return value + "a"
+                },
+              },
+            },
+          },
         },
       },
       grid: {
@@ -37,7 +71,7 @@ export default function TrafficChart() {
           top: -2,
         },
       },
-      labels: ["log entires", "log size",],
+      labels: ["desktop", "mobile"],
       legend: {
         position: "bottom",
         fontFamily: "Poppins, sans-serif",
@@ -46,13 +80,13 @@ export default function TrafficChart() {
         }
       },
       dataLabels: {
-        enabled: true,
+        enabled: false,
       },
       yaxis: {
         labels: {
           colors: "#FDBA8C",
           formatter: function (value) {
-            return value + "ka"
+            return value
           },
         },
       },
@@ -74,18 +108,29 @@ export default function TrafficChart() {
 
 
 
+  // useEffect(() => {
+  //   // TODO fetch our summary data and update here
+  //   const newSeries = [40, 50, 30, 710,23,12];
+  //   setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
+  // }, []);
+
   useEffect(() => {
-    // TODO fetch our summary data and update here
-    const newSeries = [40, 70];
-    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
-  }, []);
+    if (data) {
+      // Extract the required data for the chart
+      
+      setChartData((prevChartData) => ({ ...prevChartData, 
+        series: [ parseInt(data.environment_summary[0].Desktop/data.unique_visitors),
+                  parseInt(data.environment_summary[0].Mobile/data.unique_visitors)
+                ] }));
+    }
+  }, [data]);
 
   return (
     <div className="max-w-sm p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
   
     <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
-            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Server Stats</h5>
+            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">User Device</h5>
             <svg data-popover-target="chart-info" data-popover-placement="bottom" className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
             </svg>
@@ -114,8 +159,8 @@ export default function TrafficChart() {
         </div>
     </div>
   
-    <Chart options={chartData.options} series={chartData.series} type="radialBar" width="320" />
-
+    <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
+  
     <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
       <div className="flex justify-between items-center pt-5">
         <button
