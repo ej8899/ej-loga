@@ -15,3 +15,7 @@ https://flowbite.com/docs/plugins/charts/
 
 Icons by Flowbite
 https://flowbite.com/icons/
+
+
+# Recommended Reading
+https://dev.to/tombailey14/how-to-log-logically-8cf
