@@ -19,7 +19,7 @@ export default function VisitorChart({ data }) {
     }],
     options: {
       chart: {
-        height: 350,
+        height: 380,
         width: "100%",
         type: 'area',
         fontFamily: "Poppins, sans-serif",
@@ -100,9 +100,27 @@ export default function VisitorChart({ data }) {
   });
 
 const [selectedDays, setSelectedDays] = useState('Last 7 days');
+const [trafficChange, setTrafficChange] = useState('16.3%');
+
+const calculateTrafficChange = () => {
+  const dates = Object.keys(data.date_counts);
+
+  // Check if data for today and yesterday exists
+  if (dates.length >= 2) {
+    const todayCount = data.date_counts[dates[dates.length - 1]];
+    const yesterdayCount = data.date_counts[dates[dates.length - 2]];
+
+    const percentageChange = ((todayCount - yesterdayCount) / yesterdayCount) * 100;
+    setTrafficChange(percentageChange.toFixed(0));
+  } else {
+    setTrafficChange('-');
+    console.log("Insufficient data for traffic change calculation.");
+  }
+};
 
 useEffect(() => {
     if (data && data.date_counts) {
+      calculateTrafficChange();
       // Extract the required data for the chart
       const dates = Object.keys(data.date_counts);
       const visitorsData = dates.map((date) => data.date_counts[date]);
@@ -125,6 +143,7 @@ useEffect(() => {
   useEffect(() => {
     // Update the chart data based on the selected item
     if (data && data.date_counts) {
+      calculateTrafficChange();
       let dates = Object.keys(data.date_counts);
       let visitorsData = dates.map((date) => data.date_counts[date]);
       
@@ -244,16 +263,24 @@ useEffect(() => {
   
       <div className="flex justify-between">
         <div>
-          <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Interactions</h5>
-          <p className="text-base font-normal text-gray-500 dark:text-gray-400">(logged)</p>
+          <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Interactions Logged</h5>
+          <p className="text-base font-normal text-gray-500 dark:text-gray-400 mb-4">&nbsp;</p>
         </div>
-        <div
-          className="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
-          12%
-          <svg className="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
-          </svg>
-        </div>
+            {trafficChange > 0 ? (
+              <div
+              className="flex items-center px-2.5 py-0.5 text-base font-semibold text-center text-green-500 dark:text-green-500">{trafficChange}% <svg className="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">  
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+              </svg>
+              </div>
+              
+            ) : (
+              <div
+              className="flex items-center px-2.5 py-0.5 text-base font-semibold text-center text-orange-500 dark:text-orange-500">{trafficChange}% <svg className="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                <path stroke="orangered" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1v12m0 0 4-4m-4 4L1 9"/>
+              </svg>
+              </div>
+            )}
+        
       </div>
   
       <Chart options={chartData.options} series={chartData.series} type="area" width="320" />
@@ -270,8 +297,8 @@ useEffect(() => {
                 {selectedDays} <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
             </svg></span>} className="py-2 text-sm text-gray-700 dark:text-gray-200">
-              <Dropdown.Item onClick={() => handleItemClick(0)}>Today</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleItemClick(1)}>Yesterday</Dropdown.Item>
+              {/* <Dropdown.Item onClick={() => handleItemClick(0)}>Today</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(1)}>Yesterday</Dropdown.Item> */}
               <Dropdown.Item onClick={() => handleItemClick(2)}>Last 7 days</Dropdown.Item>
               <Dropdown.Item onClick={() => handleItemClick(3)}>Last 14 days</Dropdown.Item>
               <Dropdown.Item onClick={() => handleItemClick(4)}>Last 30 days</Dropdown.Item>
