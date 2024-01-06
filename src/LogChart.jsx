@@ -5,7 +5,7 @@ import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
-export default function LogChart() {
+export default function LogChart({data}) {
   const [chartData, setChartData] = useState({
     series: [0,1,2,3,0,0],
     
@@ -70,7 +70,7 @@ export default function LogChart() {
           top: -2,
         },
       },
-      labels: ["info", "warnings", "errors", "fatal",'debug','trace'],
+      labels: ["warnings", "info", "errors", "fatal",'debug','trace'],
       legend: {
         position: "bottom",
         fontFamily: "Poppins, sans-serif",
@@ -107,11 +107,24 @@ export default function LogChart() {
 
 
 
+  // useEffect(() => {
+  //   // TODO fetch our summary data and update here
+  //   const newSeries = [40, 50, 30, 710,23,12];
+  //   setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
+  // }, []);
+
   useEffect(() => {
-    // TODO fetch our summary data and update here
-    const newSeries = [40, 50, 30, 710,23,12];
-    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
-  }, []);
+    if (data) {
+      // Extract the required data for the chart
+      const levelsData = Object.values(data.log_levels_count);
+
+      // Update the chart series with the new data
+      setChartData((prevChartData) => ({
+        ...prevChartData,
+        series: levelsData,
+      }));
+    }
+  }, [data]);
 
   return (
     <div className="max-w-sm p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
