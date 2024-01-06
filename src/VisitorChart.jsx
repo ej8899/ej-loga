@@ -1,17 +1,22 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-case-declarations */
+/* eslint-disable react/prop-types */
 
 'use client';
-import  { useState, useEffect } from 'react';
+import  { useState, useEffect, useRef } from 'react';
+import { Dropdown } from 'flowbite-react';
 import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
-export default function VisitorChart() {
+export default function VisitorChart({ data }) {
+  const dropdownRef = useRef(null);
+
   const [chartData, setChartData] = useState({
     series: [{
       name: 'visitors',
       data: [1, 2, 1, 2, 1, 2, 1]
-    }
-    ],
+    }],
     options: {
       chart: {
         height: 350,
@@ -94,26 +99,153 @@ export default function VisitorChart() {
     },
   });
 
+const [selectedDays, setSelectedDays] = useState('Last 7 days');
 
+useEffect(() => {
+    if (data && data.date_counts) {
+      // Extract the required data for the chart
+      const dates = Object.keys(data.date_counts);
+      const visitorsData = dates.map((date) => data.date_counts[date]);
+
+      // Update the chart series with the new data
+      setChartData((prevChartData) => ({
+        ...prevChartData,
+        series: [{ name: 'visitors', data: visitorsData }],
+        options: {
+          ...prevChartData.options,
+          xaxis: {
+            ...prevChartData.options.xaxis,
+            categories: dates,
+          },
+        },
+      }));
+    }
+  }, [data, selectedDays]);
 
   useEffect(() => {
-    // TODO fetch our summary data and update here
-    // const newSeries = [40, 50, 30, 10];
-    const newSeries = [{
-      name: 'visitors',
-      data: [2, 27, 30, 10, 50, 23, 40]
+    // Update the chart data based on the selected item
+    if (data && data.date_counts) {
+      let dates = Object.keys(data.date_counts);
+      let visitorsData = dates.map((date) => data.date_counts[date]);
+      
+      const today = new Date();
+      switch (selectedDays) {
+        case "Today":
+          // Check if today is in data.date_counts
+          const todayFormatted = new Date().toISOString().split('T')[0];
+          if (data.date_counts.hasOwnProperty(todayFormatted)) {
+            // If today is in data.date_counts, use its count
+            dates = [todayFormatted];
+            visitorsData = [data.date_counts[todayFormatted]];
+          } else {
+            // If today is not in data.date_counts, set counts to 0
+            dates = [todayFormatted];
+            visitorsData = [0];
+          }
+          break;
+        case "Yesterday":
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayFormatted = yesterday.toISOString().split('T')[0];
+
+          // Check if yesterday is in data.date_counts
+          if (data.date_counts.hasOwnProperty(yesterdayFormatted)) {
+            // If yesterday is in data.date_counts, use its count
+            dates = [yesterdayFormatted];
+            visitorsData = [data.date_counts[yesterdayFormatted]];
+          } else {
+            // If yesterday is not in data.date_counts, set counts to 0
+            dates = [yesterdayFormatted];
+            visitorsData = [0];
+          }
+          break;
+        case "Last 7 Days":
+          today.setHours(0, 0, 0, 0);
+          // Calculate the date 7 days ago
+          const sevenDaysAgo = new Date(today);
+          sevenDaysAgo.setDate(today.getDate() - 7);
+
+          // Initialize arrays for dates and visitorsData
+          let datesLast7Days = [];
+          let visitorsDataLast7Days = [];
+
+          // Loop through the last 7 days and populate the arrays
+          for (let i = sevenDaysAgo; i <= today; i.setDate(i.getDate() + 1)) {
+            const currentDate = i.toISOString().split('T')[0];
+            const count = data.date_counts[currentDate] || 0;
+
+            datesLast7Days.push(currentDate);
+            visitorsDataLast7Days.push(count);
+          }
+          break;
+            // Add cases for other selectedDays as needed
+
+        default:
+          // Default case
+          dates = Object.keys(data.date_counts);
+          visitorsData = dates.map((date) => data.date_counts[date]);
+      }
+
+      // You may want to modify the chart data based on the selected item
+      // For now, I'll just log a message
+      console.log('Updating chart data for selected item:', selectedDays);
+
+      // Update the chart series with the new data
+      setChartData((prevChartData) => ({
+        ...prevChartData,
+        series: [{ name: 'visitors', data: visitorsData }],
+        options: {
+          ...prevChartData.options,
+          xaxis: {
+            ...prevChartData.options.xaxis,
+            categories: dates,
+          },
+        },
+      }));
     }
-    ];
-    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
-  }, []);
+  }, [data, selectedDays]);
+
+
+  const handleItemClick = (event) => {
+    //const selectedItem = event.target.textContent;
+    let label = "Today";
+    // console.log('Selected item:', event);
+    switch (event) {
+      case 0:
+        label = "Today";
+        break;
+      case 1:
+        label = "Yesterday";
+        break;
+      case 2:
+        label = "Last 7 Days";
+        break;
+      case 3:
+        label = "Last 14 Days";
+        break;
+      case 4:
+        label = "Last 30 Days";
+        break;
+      case 5:
+        label = "Last 90 Days";
+        break;
+      case 6:
+        label = "Last 365 Days";
+        break;
+      default:
+        label = "error";
+    }
+    setSelectedDays(label);
+    // Perform any other necessary actions
+  };
 
   return (
     <div className="max-w-sm p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
   
       <div className="flex justify-between">
         <div>
-          <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">32.4k</h5>
-          <p className="text-base font-normal text-gray-500 dark:text-gray-400">Users this week</p>
+          <h5 className="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">count interactions</h5>
+          <p className="text-base font-normal text-gray-500 dark:text-gray-400">(logged interactions)</p>
         </div>
         <div
           className="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
@@ -129,37 +261,26 @@ export default function VisitorChart() {
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
         <div className="flex justify-between items-center pt-5">
           
-          <button
-            id="dropdownDefaultButton"
-            data-dropdown-toggle="lastDaysdropdown"
-            data-dropdown-placement="bottom"
-            className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-            type="button">
-            Last 7 days
-            <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+          <div id="lastDaysdropdown" ref={dropdownRef} >
+            <Dropdown 
+              label="" 
+              dismissOnClick={true} 
+              renderTrigger={() => <span className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+              >
+                {selectedDays} <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-            </svg>
-          </button>
-          
-          <div id="lastDaysdropdown" className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-              <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
-                </li>
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
-                </li>
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 7 days</a>
-                </li>
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</a>
-                </li>
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 90 days</a>
-                </li>
-              </ul>
+            </svg></span>} className="py-2 text-sm text-gray-700 dark:text-gray-200">
+              <Dropdown.Item onClick={() => handleItemClick(0)}>Today</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(1)}>Yesterday</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(2)}>Last 7 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(3)}>Last 14 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(4)}>Last 30 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(5)}>Last 90 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(6)}>Last 180 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(6)}>Last 365 days</Dropdown.Item>
+            </Dropdown>
           </div>
+
           <a
             href="#"
             className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
