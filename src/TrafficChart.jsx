@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 
 'use client';
 import  { useState, useEffect } from 'react';
@@ -5,9 +6,9 @@ import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
-export default function TrafficChart() {
+export default function TrafficChart({ data }) {
   const [chartData, setChartData] = useState({
-    series: [0,1,2,3],
+    series: [0,1,2,3,4,5],
     
     options: {
       colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
@@ -39,8 +40,8 @@ export default function TrafficChart() {
                 offsetY: 0,
               },
               total: {
-                showAlways: true,
-                show: true,
+                showAlways: false,
+                show: false,
                 label: "Uniques:",
                 fontFamily: "Poppins, sans-serif",
                 color: "#1C64F2",
@@ -58,7 +59,7 @@ export default function TrafficChart() {
                 color: "#1C64F2",
                 offsetY:5,
                 formatter: function (value) {
-                  return value + "a"
+                  return Math.ceil(parseFloat(value)) + "%";
                 },
               },
             },
@@ -70,7 +71,7 @@ export default function TrafficChart() {
           top: -2,
         },
       },
-      labels: ["iPad", "iPhone", "Desktop", "Other"],
+      labels: ["MacOS", "iPad", "iPhone", "Windows", "Android", "Linux"],
       legend: {
         position: "bottom",
         fontFamily: "Poppins, sans-serif",
@@ -85,7 +86,7 @@ export default function TrafficChart() {
         labels: {
           colors: "#FDBA8C",
           formatter: function (value) {
-            return value + "ka"
+            return Math.ceil(parseFloat(value)) + "%";
           },
         },
       },
@@ -105,13 +106,29 @@ export default function TrafficChart() {
     },
   });
 
+  const processEnvironmentSummary = (environmentSummary, totalEntries) => {
+    // Process environment summary data and return a new series array
+    const androidTotal = ((environmentSummary["Linux armv81"] || 0) + (environmentSummary["Linux armv8l"] || 0)) / totalEntries * 100;
+    const linuxTotal = (environmentSummary["Linux x86_64"] || 0) / totalEntries * 100;
+    const macOsTotal = (environmentSummary["MacIntel"] || 0) / totalEntries * 100;
 
+    return [
+      macOsTotal,
+      (environmentSummary["iPad"] || 0) / totalEntries * 100,
+      (environmentSummary["iPhone"] || 0) / totalEntries * 100,
+      (environmentSummary["Win32"] || 0) / totalEntries * 100,
+      androidTotal,
+      linuxTotal,
+    ];
+  };
 
   useEffect(() => {
-    // TODO fetch our summary data and update here
-    const newSeries = [40, 50, 30, 10];
-    setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
-  }, []);
+    // Process incoming data and update chart
+    if (data && data.environment_summary && data.log_total_entries && data.unique_visitors) {
+      const processedData = processEnvironmentSummary(data.environment_summary[1], data.log_total_entries, data.unique_visitors);
+      setChartData((prevChartData) => ({ ...prevChartData, series: processedData }));
+    }
+  }, [data]);
 
   return (
     <div className="max-w-sm p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
