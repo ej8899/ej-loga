@@ -124,41 +124,31 @@ export default function Ourdata() {
   };
 
   const cleanLogMessage = (logMessage) => {
-    if (logMessage.includes('[ERROR]')) {
-      const cleanedMessage = `<span class='text-red-500'>${logMessage}</span>`;
-      return cleanedMessage;
-    } else if (logMessage.includes('[WARN]')) {
-      const cleanedMessage = `<span class='text-orange-500'>${logMessage}</span>`;
-      return cleanedMessage;
-    } else {
-      return logMessage;
+    const messageTypeStyles = {
+      '[ERROR]': 'text-red-500',
+      '[WARN]': 'text-orange-500',
+      '[TRACE]': 'text-blue-700',
+    };
+  
+    for (const [messageType, style] of Object.entries(messageTypeStyles)) {
+      if (logMessage.includes(messageType)) {
+        return `<span class='${style}'>${logMessage}</span>`;
+      }
     }
-  }
+  
+    return logMessage;
+  };
+  
 
   return (
     <div className="overflow-x-auto">
       
       <div className="mb-4">
         <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
-        {/* <select
-          id="messageType"
-          value={selectedMessageType}
-          onChange={handleMessageTypeChange}
-          className="p-2 border rounded"
-        >
-        <option value="all">All ({jsonData ? jsonData.length : 0})</option>
-          {Object.keys(messageTypeCounts)
-            .sort()
-            .map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)} ({messageTypeCounts[type]})
-              </option>
-            ))}
-        </select> */}
         <Dropdown 
               label="" 
               dismissOnClick={true} 
-              renderTrigger={() => <span className="text-md font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+              renderTrigger={() => <span className="text-md font-medium text-blue-700 dark:text-gray-400 hover:text-orange-500 text-center inline-flex items-center dark:hover:text-white"
               >
                 {selectedMessageType} <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
