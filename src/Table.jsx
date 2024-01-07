@@ -41,6 +41,7 @@ export default function Ourdata() {
         const dataSizeInKB = dataSizeInBytes / 1024;
         
         setJsonData(data.reverse());
+        setVisibleItems((prevVisibleItems) => Math.min(prevVisibleItems, data.length));
         // console.log("SAMPLE:",data[0])
         // console.log("Data Size: ", dataSizeInKB.toFixed(2), " KB");
         logger.info('(loga) fetched data - ' + dataSizeInKB.toFixed(2) + " KB");
@@ -82,8 +83,10 @@ export default function Ourdata() {
   };
 
   const handleMessageTypeChange = (event) => {
-    console.log("event.target.value:", event.target.value);
+    // console.log("event.target.value:", event.target.value);
     setSelectedMessageType(event.target.value);
+    setVisibleItems(filteredData.length);
+    console.log('vis items',filteredData.length)
   };
 
   const filteredData = jsonData
@@ -139,6 +142,10 @@ export default function Ourdata() {
     return logMessage;
   };
   
+  const isEndOfFile = visibleItems >= filteredData.length;
+  console.log('end of file:',isEndOfFile)
+  console.log('filtered data length:', filteredData.length);
+  console.log('visible items:', visibleItems);
 
   return (
     <div className="overflow-x-auto">
@@ -214,16 +221,17 @@ export default function Ourdata() {
         </div>
       )}
 
-      {jsonData && filteredData.length < jsonData.length && (
-        <div className="text-center mt-4">
-          <button
-            onClick={handleLoadMore}
-            className="p-2 rounded bg-blue-500 text-white"
-          >
-            Load More...
-          </button>
-        </div>
-      )}
+        {jsonData && (
+          <div className="text-center mt-4">
+            <button
+              onClick={handleLoadMore}
+              className="p-2 rounded bg-blue-500 text-white"
+            >
+              Load More...
+            </button>
+          </div>
+        )}
+      
     </div>
   );
 }
