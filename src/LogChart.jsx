@@ -37,6 +37,7 @@ export default function LogChart({data}) {
     
     options: {
       // colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694","teal","orange"],
+      colors: ["#1C64F2", "#16BDCA", "#FFA500", "#E74694",'#FFFF00','#A020F0','orange'],
       tooltip: {
         enabled: true,
         fillSeriesColor: false,
