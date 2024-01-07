@@ -5,6 +5,31 @@ import  { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts'
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
+const downloadCSV = (dateCounts) => {
+  let csvContent = 'data:text/csv;charset=utf-8,';
+  if (!dateCounts) return;
+
+  // Create headers
+  const headers = ['Date', 'Count'];
+  csvContent += headers.join(',') + '\n';
+
+  // Add rows
+  Object.keys(dateCounts).forEach((date) => {
+    const count = dateCounts[date];
+    csvContent += `${date},${count}\n`;
+  });
+
+  // Create a data URI and trigger download
+  const encodedURI = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedURI);
+  link.setAttribute('download', 'erniejohnson.ca_interactions_by_date.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+
 
 export default function LogChart({data}) {
   const [chartData, setChartData] = useState({
@@ -115,6 +140,9 @@ export default function LogChart({data}) {
   });
 
 
+  const handleDownloadClick = () => {
+    downloadCSV(data);
+  };
 
   // useEffect(() => {
   //   // TODO fetch our summary data and update here
@@ -158,7 +186,12 @@ export default function LogChart({data}) {
             </div>
           </div>
         <div>
-          <button type="button" data-tooltip-target="data-tooltip" data-tooltip-placement="bottom" className="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm"><svg className="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+          <button 
+            type="button"
+            onClick={() => downloadCSV(data.date_counts)}
+            data-tooltip-target="data-tooltip"
+            data-tooltip-placement="bottom" 
+            className="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm"><svg className="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
     </svg><span className="sr-only">Download data</span>
           </button>
