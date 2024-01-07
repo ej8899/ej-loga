@@ -11,7 +11,7 @@ export default function TrafficChart({ data }) {
     series: [0,1,2,3,4,5],
     
     options: {
-      colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694"],
+      colors: ["#1C64F2", "#16BDCA", "#FFA500", "#E74694",'#FFFF00','#A020F0','orange'],
       tooltip: {
         enabled: true,
         fillSeriesColor: false,
