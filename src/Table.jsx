@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import { Spinner } from 'flowbite-react';
-import { Table } from 'flowbite-react';
+import { Table, Dropdown } from 'flowbite-react';
 import { Label,  } from 'flowbite-react';
 
 import logger from './logger';
@@ -140,7 +140,7 @@ export default function Ourdata() {
       
       <div className="mb-4">
         <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
-        <select
+        {/* <select
           id="messageType"
           value={selectedMessageType}
           onChange={handleMessageTypeChange}
@@ -154,7 +154,25 @@ export default function Ourdata() {
                 {type.charAt(0).toUpperCase() + type.slice(1)} ({messageTypeCounts[type]})
               </option>
             ))}
-        </select>
+        </select> */}
+        <Dropdown 
+              label="" 
+              dismissOnClick={true} 
+              renderTrigger={() => <span className="text-md font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+              >
+                {selectedMessageType} <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+            </svg></span>} className="py-2 text-sm text-gray-700 dark:text-gray-200">
+              {/* <Dropdown.Item onClick={() => handleItemClick(6)}>Last 365 days</Dropdown.Item> */}
+              <Dropdown.Item value="all" onClick={() => handleMessageTypeChange({ target: { value: 'all' } })}>All ({jsonData ? jsonData.length : 0})</Dropdown.Item>
+          {Object.keys(messageTypeCounts)
+            .sort()
+            .map((type) => (
+              <Dropdown.Item key={type} value={type} onClick={() => handleMessageTypeChange({ target: { value: type } })}>
+                {type.charAt(0).toUpperCase() + type.slice(1)} ({messageTypeCounts[type]})
+              </Dropdown.Item>
+            ))}
+            </Dropdown>
       </div>
 
       {jsonData ? (
