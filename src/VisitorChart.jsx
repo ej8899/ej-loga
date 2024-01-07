@@ -19,6 +19,7 @@ export default function VisitorChart({ data }) {
     }],
     options: {
       chart: {
+        foreColor: "#0099ff",
         height: 380,
         width: "100%",
         type: 'area',
@@ -32,6 +33,7 @@ export default function VisitorChart({ data }) {
       },
       dataLabels: {
         enabled: false,
+        
       },
       stroke: {
         curve: 'smooth',
@@ -74,25 +76,25 @@ export default function VisitorChart({ data }) {
         axisTicks: {
           show: true,
           borderType: 'solid',
-          color: '#78909C',
+          color: '#777',
           height: 6,
           offsetX: 0,
           offsetY: 0
         },
         type: 'datetime',
-        colors: ['#FFA500'],
-        color: '#FFA500',
-        categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+        colors: ['#777'],
+        color: '#777',
+        // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
       },
       tooltip: {
         enabled: true,
-        fillSeriesColor: true,
-        color: '#FFA500',
-        style: {
-          color: '#FFA500',
-        },
+        fillSeriesColor: false,
+        // color: 'red',
+        // style: {
+        //   color: 'red',
+        // },
         x: {
-          color: '#FFA500',
+          color: 'yellow',
           show: false,
         },
       },
@@ -118,27 +120,41 @@ const calculateTrafficChange = () => {
   }
 };
 
-useEffect(() => {
-    if (data && data.date_counts) {
-      calculateTrafficChange();
-      // Extract the required data for the chart
-      const dates = Object.keys(data.date_counts);
-      const visitorsData = dates.map((date) => data.date_counts[date]);
+// useEffect(() => {
+//     if (data && data.date_counts) {
+//       calculateTrafficChange();
+//       // Extract the required data for the chart
+//       const dates = Object.keys(data.date_counts);
+//       const visitorsData = dates.map((date) => data.date_counts[date]);
 
-      // Update the chart series with the new data
-      setChartData((prevChartData) => ({
-        ...prevChartData,
-        series: [{ name: 'visitors', data: visitorsData }],
-        options: {
-          ...prevChartData.options,
-          xaxis: {
-            ...prevChartData.options.xaxis,
-            categories: dates,
-          },
+//       // Update the chart series with the new data
+//       setChartData((prevChartData) => ({
+//         ...prevChartData,
+//         series: [{ name: 'visitors', data: visitorsData }],
+//         options: {
+//           ...prevChartData.options,
+//           xaxis: {
+//             ...prevChartData.options.xaxis,
+//             categories: dates,
+//           },
+//         },
+//       }));
+//     }
+//   }, [data, selectedDays]);
+
+  const updateChartData = (dates, visitorsData) => {
+    setChartData((prevChartData) => ({
+      ...prevChartData,
+      series: [{ name: 'visitors', data: visitorsData }],
+      options: {
+        ...prevChartData.options,
+        xaxis: {
+          ...prevChartData.options.xaxis,
+          categories: dates,
         },
-      }));
-    }
-  }, [data, selectedDays]);
+      },
+    }));
+  };
 
   useEffect(() => {
     // Update the chart data based on the selected item
@@ -147,62 +163,151 @@ useEffect(() => {
       let dates = Object.keys(data.date_counts);
       let visitorsData = dates.map((date) => data.date_counts[date]);
       
-      const today = new Date();
+      const todayUTC = new Date();
       switch (selectedDays) {
-        case "Today":
-          // Check if today is in data.date_counts
-          const todayFormatted = new Date().toISOString().split('T')[0];
-          if (data.date_counts.hasOwnProperty(todayFormatted)) {
-            // If today is in data.date_counts, use its count
-            dates = [todayFormatted];
-            visitorsData = [data.date_counts[todayFormatted]];
-          } else {
-            // If today is not in data.date_counts, set counts to 0
-            dates = [todayFormatted];
-            visitorsData = [0];
-          }
-          break;
-        case "Yesterday":
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayFormatted = yesterday.toISOString().split('T')[0];
-
-          // Check if yesterday is in data.date_counts
-          if (data.date_counts.hasOwnProperty(yesterdayFormatted)) {
-            // If yesterday is in data.date_counts, use its count
-            dates = [yesterdayFormatted];
-            visitorsData = [data.date_counts[yesterdayFormatted]];
-          } else {
-            // If yesterday is not in data.date_counts, set counts to 0
-            dates = [yesterdayFormatted];
-            visitorsData = [0];
-          }
-          break;
         case "Last 7 Days":
-          today.setHours(0, 0, 0, 0);
-          // Calculate the date 7 days ago
-          const sevenDaysAgo = new Date(today);
-          sevenDaysAgo.setDate(today.getDate() - 7);
-
+          todayUTC.setUTCHours(0, 0, 0, 0);
+        
+          // Calculate the date 7 days ago in UTC
+          const sevenDaysAgoUTC = new Date(todayUTC);
+          sevenDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 6);
+        
           // Initialize arrays for dates and visitorsData
           let datesLast7Days = [];
           let visitorsDataLast7Days = [];
-
-          // Loop through the last 7 days and populate the arrays
-          for (let i = sevenDaysAgo; i <= today; i.setDate(i.getDate() + 1)) {
+        
+          // Loop through the last 7 days (including today) in UTC and populate the arrays
+          for (let i = new Date(sevenDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
             const currentDate = i.toISOString().split('T')[0];
             const count = data.date_counts[currentDate] || 0;
-
+        
             datesLast7Days.push(currentDate);
             visitorsDataLast7Days.push(count);
           }
+          console.log(datesLast7Days)
+          console.log(visitorsDataLast7Days)
+          updateChartData(datesLast7Days, visitorsDataLast7Days);
           break;
-            // Add cases for other selectedDays as needed
+            
+          case "Last 14 Days":
+            todayUTC.setUTCHours(0, 0, 0, 0);
+          
+            // Calculate the date 14 days ago in UTC
+            const fourteenDaysAgoUTC = new Date(todayUTC);
+            fourteenDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 13);
+          
+            // Initialize arrays for dates and visitorsData
+            let datesLast14Days = [];
+            let visitorsDataLast14Days = [];
+          
+            // Loop through the last 14 days (including today) in UTC and populate the arrays
+            for (let i = new Date(fourteenDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
+              const currentDate = i.toISOString().split('T')[0];
+              const count = data.date_counts[currentDate] || 0;
+          
+              datesLast14Days.push(currentDate);
+              visitorsDataLast14Days.push(count);
+            }
+    
+            updateChartData(datesLast14Days, visitorsDataLast14Days);
+            break;
+
+          case "Last 30 Days":
+            todayUTC.setUTCHours(0, 0, 0, 0);
+            
+            // Calculate the date 30 days ago in UTC
+            const thirtyDaysAgoUTC = new Date(todayUTC);
+            thirtyDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 29);
+            
+            // Initialize arrays for dates and visitorsData
+            let datesLast30Days = [];
+            let visitorsDataLast30Days = [];
+            
+            // Loop through the last 30 days (including today) in UTC and populate the arrays
+            for (let i = new Date(thirtyDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
+              const currentDate = i.toISOString().split('T')[0];
+              const count = data.date_counts[currentDate] || 0;
+            
+              datesLast30Days.push(currentDate);
+              visitorsDataLast30Days.push(count);
+            }
+          
+            updateChartData(datesLast30Days, visitorsDataLast30Days);
+            break;
+          case "Last 90 Days":
+            todayUTC.setUTCHours(0, 0, 0, 0);
+            
+            // Calculate the date 90 days ago in UTC
+            const ninetyDaysAgoUTC = new Date(todayUTC);
+            ninetyDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 89);
+            
+            // Initialize arrays for dates and visitorsData
+            let datesLast90Days = [];
+            let visitorsDataLast90Days = [];
+            
+            // Loop through the last 90 days (including today) in UTC and populate the arrays
+            for (let i = new Date(ninetyDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
+              const currentDate = i.toISOString().split('T')[0];
+              const count = data.date_counts[currentDate] || 0;
+            
+              datesLast90Days.push(currentDate);
+              visitorsDataLast90Days.push(count);
+            }
+          
+            updateChartData(datesLast90Days, visitorsDataLast90Days);
+            break;
+          case "Last 180 Days":
+            todayUTC.setUTCHours(0, 0, 0, 0);
+            
+            // Calculate the date 180 days ago in UTC
+            const oneEightyDaysAgoUTC = new Date(todayUTC);
+            oneEightyDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 179);
+            
+            // Initialize arrays for dates and visitorsData
+            let datesLast180Days = [];
+            let visitorsDataLast180Days = [];
+            
+            // Loop through the last 180 days (including today) in UTC and populate the arrays
+            for (let i = new Date(oneEightyDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
+              const currentDate = i.toISOString().split('T')[0];
+              const count = data.date_counts[currentDate] || 0;
+            
+              datesLast180Days.push(currentDate);
+              visitorsDataLast180Days.push(count);
+            }
+
+            updateChartData(datesLast180Days, visitorsDataLast180Days);
+            break;
+
+          case "Last 365 Days":
+            todayUTC.setUTCHours(0, 0, 0, 0);
+            
+            // Calculate the date 365 days ago in UTC
+            const threeSixtyFiveDaysAgoUTC = new Date(todayUTC);
+            threeSixtyFiveDaysAgoUTC.setUTCDate(todayUTC.getUTCDate() - 364);
+            
+            // Initialize arrays for dates and visitorsData
+            let datesLast365Days = [];
+            let visitorsDataLast365Days = [];
+            
+            // Loop through the last 365 days (including today) in UTC and populate the arrays
+            for (let i = new Date(threeSixtyFiveDaysAgoUTC); i <= todayUTC; i.setUTCDate(i.getUTCDate() + 1)) {
+              const currentDate = i.toISOString().split('T')[0];
+              const count = data.date_counts[currentDate] || 0;
+            
+              datesLast365Days.push(currentDate);
+              visitorsDataLast365Days.push(count);
+            }
+          
+            updateChartData(datesLast365Days, visitorsDataLast365Days);
+            break;
+            
 
         default:
           // Default case
           dates = Object.keys(data.date_counts);
           visitorsData = dates.map((date) => data.date_counts[date]);
+          updateChartData(dates, visitorsData);
       }
 
       // You may want to modify the chart data based on the selected item
@@ -210,17 +315,17 @@ useEffect(() => {
       console.log('Updating chart data for selected item:', selectedDays);
 
       // Update the chart series with the new data
-      setChartData((prevChartData) => ({
-        ...prevChartData,
-        series: [{ name: 'visitors', data: visitorsData }],
-        options: {
-          ...prevChartData.options,
-          xaxis: {
-            ...prevChartData.options.xaxis,
-            categories: dates,
-          },
-        },
-      }));
+      // setChartData((prevChartData) => ({
+      //   ...prevChartData,
+      //   series: [{ name: 'visitors', data: visitorsData }],
+      //   options: {
+      //     ...prevChartData.options,
+      //     xaxis: {
+      //       ...prevChartData.options.xaxis,
+      //       categories: dates,
+      //     },
+      //   },
+      // }));
     }
   }, [data, selectedDays]);
 
@@ -230,12 +335,12 @@ useEffect(() => {
     let label = "Today";
     // console.log('Selected item:', event);
     switch (event) {
-      case 0:
-        label = "Today";
-        break;
-      case 1:
-        label = "Yesterday";
-        break;
+      // case 0:
+      //   label = "Today";
+      //   break;
+      // case 1:
+      //   label = "Yesterday";
+      //   break;
       case 2:
         label = "Last 7 Days";
         break;
@@ -249,6 +354,9 @@ useEffect(() => {
         label = "Last 90 Days";
         break;
       case 6:
+        label = "Last 180 Days";
+        break;
+      case 7:
         label = "Last 365 Days";
         break;
       default:
@@ -304,7 +412,7 @@ useEffect(() => {
               <Dropdown.Item onClick={() => handleItemClick(4)}>Last 30 days</Dropdown.Item>
               <Dropdown.Item onClick={() => handleItemClick(5)}>Last 90 days</Dropdown.Item>
               <Dropdown.Item onClick={() => handleItemClick(6)}>Last 180 days</Dropdown.Item>
-              <Dropdown.Item onClick={() => handleItemClick(6)}>Last 365 days</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleItemClick(7)}>Last 365 days</Dropdown.Item>
             </Dropdown>
           </div>
 
