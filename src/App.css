@@ -2,3 +2,28 @@
   margin: 0 auto;
 }
 
+.apexcharts-legend-series {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.apexcharts-legend-series .apexcharts-legend-marker {
+  margin-right: 5px; /* Adjust the margin as needed */
+}
+
+.apexcharts-legend-series .apexcharts-legend-text {
+  white-space: nowrap;
+}
+
+.apexcharts-legend {
+  margin: auto !important;
+  width: 220px !important;
+  
+}
+
+.apexcharts-canvas {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  
+}
