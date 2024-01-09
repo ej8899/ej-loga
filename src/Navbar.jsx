@@ -4,10 +4,56 @@
 import { Navbar, Modal, Button } from 'flowbite-react';
 import { DarkThemeToggle } from 'flowbite-react';
 import { useState } from 'react';
+import logger from './logger';
 
 export default function Ournavbar() {
   const [openAboutModal, setOpenAboutModal] = useState(false);
   const [openContactModal, setOpenContactModal] = useState(false);
+
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const [isFormValidated, setIsFormValidated] = useState(false);
+  const [isSendPending, setIsSendPending] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!isFormValidated) {
+      // setMessageValidation('Please complete all sections of this form!');
+      return;
+    }
+    setIsSendPending(true);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: '7160e73c-4a32-4952-ab02-e07ea131ed58',
+          from_name: 'erniejohnson.ca',
+          subject: 'erniejohnson.ca - LogAnalysis - contact form response',
+          message,
+          email,
+          botcheck: '',
+        }),
+      });
+      const json = (await response.json());
+
+      setIsSendPending(false);
+      if (!json.success) throw new Error('Something went wrong.');
+
+      setIsSent(true);
+      logger.trace('contact - sent a message success');
+    } catch (err) {
+      logger.error('error sending contact form');
+      setIsSendPending(false);
+      setIsError(true);
+    }
+  }
 
   return (
     <Navbar fluid rounded>
@@ -69,7 +115,9 @@ export default function Ournavbar() {
   <div className="py-8 px-4 mx-auto max-w-screen-md">
       
       <p className="mb-8 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">Got a technical issue? Want to send feedback? Need details about our web & app development plan? Let us know.</p>
-      <form action="#" className="space-y-8">
+      <form className="space-y-8"
+        onSubmit={(e) => void handleFormSubmit(e)}
+      >
           <div>
               <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Your email</label>
               <input type="email" id="email" className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light" placeholder="name@yourdomain.com" required/>
