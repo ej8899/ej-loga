@@ -14,7 +14,7 @@ export default function VisitorChart({ data }) {
 
   const [chartData, setChartData] = useState({
     series: [{
-      name: 'visitors',
+      name: 'interactions',
       data: [1, 2, 1, 2, 1, 2, 1]
     }],
     options: {
