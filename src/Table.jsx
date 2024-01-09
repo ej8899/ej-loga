@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { Spinner } from 'flowbite-react';
 import { Table, Dropdown } from 'flowbite-react';
-import { Label,  } from 'flowbite-react';
+import { Label, Tooltip } from 'flowbite-react';
 
 import logger from './logger';
 
@@ -18,7 +18,9 @@ export default function Ourdata() {
   const [selectedMessageType, setSelectedMessageType] = useState('all');
   const [visibleItems, setVisibleItems] = useState(20); // Initial number of items to display
   const [messageTypeCounts, setMessageTypeCounts] = useState({}); // State to store message type counts
+  const [loadMoreCount, setLoadMoreCount] = useState(1); // New state to track load more count
 
+  let loadMoreButton = true;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,14 +81,27 @@ export default function Ourdata() {
 
   const handleLoadMore = () => {
     // Increase visible items by 20 on each "Load More" click
+    if((loadMoreCount * 20) > filteredData.length) {
+      loadMoreButton = false;
+      return;
+    }
     setVisibleItems((prevVisibleItems) => prevVisibleItems + 20);
+    setLoadMoreCount((prevCount) => prevCount + 1);
+    console.log('load more count:',loadMoreCount)
   };
 
   const handleMessageTypeChange = (event) => {
     // console.log("event.target.value:", event.target.value);
+    if((20) > filteredData.length) {
+      loadMoreButton = false;
+    } else {
+      loadMoreButton = true;
+    }
+    
+    setVisibleItems(20);
+    setLoadMoreCount(1);
     setSelectedMessageType(event.target.value);
-    setVisibleItems(filteredData.length);
-    console.log('vis items',filteredData.length)
+    console.log(loadMoreButton)
   };
 
   const filteredData = jsonData
@@ -143,10 +158,7 @@ export default function Ourdata() {
   };
   
   const isEndOfFile = visibleItems >= filteredData.length;
-  console.log('end of file:',isEndOfFile)
-  console.log('filtered data length:', filteredData.length);
-  console.log('visible items:', visibleItems);
-
+  
   return (
     <div className="overflow-x-auto">
       
@@ -174,7 +186,7 @@ export default function Ourdata() {
 
       {jsonData ? (
         filteredData.length > 0 ? (
-        <Table hoverable>
+        <Table hoverable className=''>
           <Table.Head className='bg-slate-500 dark:bg-gray-800'>
             <Table.HeadCell>Date</Table.HeadCell>
             <Table.HeadCell>Log Message</Table.HeadCell>
@@ -197,17 +209,29 @@ export default function Ourdata() {
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
                 <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
                 <Table.Cell>
-                  <a
-                    href="#"
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-                  >
-                    delete
-                  </a>
+                  <div className="flex items-center space-x-1">
+                    <Tooltip content="Delete entry (disabled)">
+                      <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                      </svg>
+                      </Tooltip>
+                    <Tooltip content="Bookmark for follow-up (disabled)">
+                      <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z"/>
+                      </svg>
+                    </Tooltip>
+                    <Tooltip content="Archive this entry (disabled)">
+                    <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                      <path stroke="currentColor" strokeLinejoin="round" strokeWidth="1" d="M8 8v1h4V8m4 7H4a1 1 0 0 1-1-1V5h14v9a1 1 0 0 1-1 1ZM2 1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z"/>
+                    </svg>
+                    </Tooltip>
+                  </div>
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
+        
         ) : (
           <div className="text-center">
             <p>No matching data found.</p>
