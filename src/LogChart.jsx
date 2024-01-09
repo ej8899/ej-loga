@@ -3,6 +3,8 @@
 'use client';
 import  { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts'
+import { Tooltip } from 'flowbite-react';
+
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 const downloadCSV = (dateCounts) => {
@@ -187,6 +189,7 @@ export default function LogChart({data}) {
             </div>
           </div>
         <div>
+        <Tooltip content="Download CSV of data">
           <button 
             type="button"
             onClick={() => downloadCSV(data.date_counts)}
@@ -196,10 +199,7 @@ export default function LogChart({data}) {
       <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
     </svg><span className="sr-only">Download data</span>
           </button>
-          <div id="data-tooltip" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-              Download CSV
-              <div className="tooltip-arrow" data-popper-arrow></div>
-          </div>
+          </Tooltip>
         </div>
     </div>
   
