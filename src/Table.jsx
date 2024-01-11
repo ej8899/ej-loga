@@ -243,7 +243,7 @@ export default function Ourdata() {
     }
     if (log.includes('[TRACE]'))  {
       style = "bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300";
-      text = "info";
+      text = "trace";
     }
     if (log.includes('[DEBUG]')) return 'debug';
     if (log.includes('[INFO]')) {
@@ -334,7 +334,7 @@ export default function Ourdata() {
                   <div className="flex items-center space-x-1">
                     <Tooltip content="Delete entry (disabled)">
                       <button>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                        <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400 m-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
                           <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
                         </svg>
                       </button>
@@ -342,11 +342,11 @@ export default function Ourdata() {
                     <Tooltip content="Bookmark for review">
                       <button onClick={() => handleBookmarkClick(row.date)}>
                       {isBookmarked(row.date) ? (
-                          <svg className="w-6 h-6 text-orange-700 dark:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                          <svg className="w-6 h-6 text-orange-700 dark:text-orange-400 m-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                           <path d="M13 20a1 1 0 0 1-.64-.231L7 15.3l-5.36 4.469A1 1 0 0 1 0 19V2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v17a1 1 0 0 1-1 1Z"/>
                         </svg>
                         ) : (
-                          <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
+                          <svg className="mr-4 w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
                             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z"/>
                           </svg>
                       )}
