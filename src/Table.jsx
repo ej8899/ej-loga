@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-import { Spinner } from 'flowbite-react';
+import { Button, Spinner } from 'flowbite-react';
 import { Table, Dropdown } from 'flowbite-react';
 import { Label, Tooltip } from 'flowbite-react';
 
@@ -49,14 +49,15 @@ export default function Ourdata() {
         setJsonData(data.reverse());
         //setFilteredData(data.reverse());
         setSelectedMessageType('all');
-        
+        //setFilteredData(data.reverse());
+
         setVisibleItems((prevVisibleItems) => Math.min(prevVisibleItems, data.length));
         // console.log("SAMPLE:",data[0])
         // console.log("Data Size: ", dataSizeInKB.toFixed(2), " KB");
-        logger.info('(loga) fetched data - ' + dataSizeInKB.toFixed(2) + " KB");
+        logger.info('fetched data - ' + dataSizeInKB.toFixed(2) + " KB");
       } catch (error) {
         console.error("Error fetching data:", error.message);
-        logger.error('(loga) error fetching data');
+        logger.error('error fetching data');
       }
     };
 
@@ -69,6 +70,18 @@ export default function Ourdata() {
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   // Calculate message type counts when jsonData changes
+  //   if (jsonData) {
+  //     const counts = jsonData.reduce((accumulator, row) => {
+  //       const messageType = getMessageType(row.log);
+  //       accumulator[messageType] = (accumulator[messageType] || 0) + 1;
+  //       return accumulator;
+  //     }, {});
+  //     setMessageTypeCounts(counts);
+  //   }
+  // }, [jsonData]);
+
   useEffect(() => {
     // Calculate message type counts when jsonData changes
     if (jsonData) {
@@ -80,6 +93,10 @@ export default function Ourdata() {
       setMessageTypeCounts(counts);
     }
   }, [jsonData]);
+
+
+  
+
 
   const getMessageType = (log) => {
     if (log.includes('[ERROR]')) return 'error';
@@ -94,13 +111,13 @@ export default function Ourdata() {
 
   const handleLoadMore = () => {
     // Increase visible items by 20 on each "Load More" click
-    if((loadMoreCount * 20) > filteredData.length) {
+    if((loadMoreCount * 20) > jsonData.length) {
       loadMoreButton = false;
       return;
     }
     setVisibleItems((prevVisibleItems) => prevVisibleItems + 20);
     setLoadMoreCount((prevCount) => prevCount + 1);
-    console.log('load more count:',loadMoreCount)
+    //console.log('load more count:',loadMoreCount)
   };
 
   // const handleMessageTypeChange = (event) => {
@@ -197,18 +214,50 @@ export default function Ourdata() {
       '[ERROR]': 'text-red-500',
       '[WARN]': 'text-orange-500',
       '[TRACE]': 'text-blue-700',
+      '[DEBUG]': 'text-blue-400',
+      // '[INFO]': 'text-green-500',
+      '[FATAL]': 'text-red-500',
     };
   
+    let cleanedMessage = logMessage;
+
     for (const [messageType, style] of Object.entries(messageTypeStyles)) {
       if (logMessage.includes(messageType)) {
-        return `<span class='${style}'>${logMessage}</span>`;
+        cleanedMessage = cleanedMessage.replace(messageType, '');
+        return `<span class='${style}'>${cleanedMessage}</span>`;
       }
     }
   
-    return logMessage;
+    return cleanedMessage;
+  };
+
+  const renderPill = (log) => {
+    let style = '', text ="";
+    if (log.includes('[ERROR]')) {
+      style = "bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300";
+      text = "error";
+    }
+    if (log.includes('[WARN]'))  {
+      style = "bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300";
+      text = "warning";
+    }
+    if (log.includes('[TRACE]'))  {
+      style = "bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300";
+      text = "info";
+    }
+    if (log.includes('[DEBUG]')) return 'debug';
+    if (log.includes('[INFO]')) {
+      style = "bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300";
+      text = "info";
+    }
+    if (log.includes('[FATAL]')) return 'fatal';
+
+    return (
+      <span className={`uppercase ${style}`}>{text}</span>
+    );
   };
   
-  const isEndOfFile = visibleItems >= filteredData.length;
+  // const isEndOfFile = visibleItems >= filteredData.length;
 
 
   const saveBookmarksToLocalStorage = (bookmarks) => {
@@ -227,9 +276,10 @@ export default function Ourdata() {
 
   
   return (
-    <div >
+    <div className="flex flex-col justify-center items-center">
+    <div className='max-w-screen-2xl w-full' >
       
-      <div className="mb-4">
+      <div className="w-full">
         <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
         <Dropdown 
               label="" 
@@ -259,6 +309,7 @@ export default function Ourdata() {
         <Table hoverable className=''>
           <Table.Head className='bg-slate-500 dark:bg-gray-800'>
             <Table.HeadCell>Date</Table.HeadCell>
+            <Table.HeadCell>Type</Table.HeadCell>
             <Table.HeadCell>Log Message</Table.HeadCell>
             <Table.HeadCell>User ID</Table.HeadCell>
             <Table.HeadCell>Environment</Table.HeadCell>
@@ -275,6 +326,7 @@ export default function Ourdata() {
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {row.date}
                 </Table.Cell>
+                <Table.Cell>{renderPill(row.log)}</Table.Cell>
                 <Table.Cell dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} />
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
                 <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
@@ -331,13 +383,14 @@ export default function Ourdata() {
           <div className="text-center mt-4">
             <button
               onClick={handleLoadMore}
-              className="p-2 rounded bg-blue-500 text-white"
+              className="p-2 rounded-xl bg-blue-500 text-white"
             >
               Load More...
             </button>
           </div>
         )}
       
+    </div>
     </div>
   );
 }
