@@ -227,7 +227,7 @@ export default function Ourdata() {
 
   
   return (
-    <div className="overflow-x-auto">
+    <div >
       
       <div className="mb-4">
         <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
