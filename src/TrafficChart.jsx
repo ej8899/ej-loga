@@ -131,7 +131,7 @@ export default function TrafficChart({ data }) {
   }, [data]);
 
   return (
-    <div className="max-w-sm p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
+    <div className="max-w-sm m-2 p-6 gap-4 justify-center flex-col flex border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800">
   
     <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
