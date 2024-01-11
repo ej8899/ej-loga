@@ -19,10 +19,14 @@ export default function Ourdata() {
   const [visibleItems, setVisibleItems] = useState(20); // Initial number of items to display
   const [messageTypeCounts, setMessageTypeCounts] = useState({}); // State to store message type counts
   const [loadMoreCount, setLoadMoreCount] = useState(1); // New state to track load more count
+  const [bookmarkedEntries, setBookmarkedEntries] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  
 
   let loadMoreButton = true;
 
   useEffect(() => {
+    // load data from API
     const fetchData = async () => {
       try {
         const response = await fetch(
@@ -43,6 +47,9 @@ export default function Ourdata() {
         const dataSizeInKB = dataSizeInBytes / 1024;
         
         setJsonData(data.reverse());
+        //setFilteredData(data.reverse());
+        setSelectedMessageType('all');
+        
         setVisibleItems((prevVisibleItems) => Math.min(prevVisibleItems, data.length));
         // console.log("SAMPLE:",data[0])
         // console.log("Data Size: ", dataSizeInKB.toFixed(2), " KB");
@@ -52,6 +59,12 @@ export default function Ourdata() {
         logger.error('(loga) error fetching data');
       }
     };
+
+    // load bookmarked entries
+    const storedBookmarks = localStorage.getItem('bookmarkedEntries');
+    if (storedBookmarks) {
+      setBookmarkedEntries(JSON.parse(storedBookmarks));
+    }
 
     fetchData();
   }, []);
@@ -90,37 +103,75 @@ export default function Ourdata() {
     console.log('load more count:',loadMoreCount)
   };
 
+  // const handleMessageTypeChange = (event) => {
+  //   // console.log("event.target.value:", event.target.value);
+  //   if((20) > filteredData.length) {
+  //     loadMoreButton = false;
+  //   } else {
+  //     loadMoreButton = true;
+  //   }
+    
+  //   setVisibleItems(20);
+  //   setLoadMoreCount(1);
+  //   setSelectedMessageType(event.target.value);
+  //   console.log(loadMoreButton)
+  // };
+
   const handleMessageTypeChange = (event) => {
-    // console.log("event.target.value:", event.target.value);
-    if((20) > filteredData.length) {
+    if ((20) > filteredData.length) {
       loadMoreButton = false;
     } else {
       loadMoreButton = true;
     }
-    
+
+    setSelectedMessageType(event.target.value);
     setVisibleItems(20);
     setLoadMoreCount(1);
-    setSelectedMessageType(event.target.value);
-    console.log(loadMoreButton)
+
+    const selectedType = event.target.value;
+
+    if (selectedType === 'bookmarks') {
+      setFilteredData(bookmarkedEntries.map(date => jsonData.find(row => row.date === date)));
+    } else {
+      setFilteredData(
+        jsonData
+          ? selectedType === 'all'
+            ? jsonData.slice(0, visibleItems)
+            : jsonData
+                .filter((row) => {
+                  const messageTypePrefixes = {
+                    error: '[ERROR]',
+                    warn: '[WARN]',
+                    trace: '[TRACE]',
+                    debug: '[DEBUG]',
+                    info: '[INFO]',
+                    fatal: '[FATAL]',
+                  };
+                  return row.log.includes(messageTypePrefixes[selectedType]);
+                })
+                .slice(0, visibleItems)
+          : []
+      );
+    }
   };
 
-  const filteredData = jsonData
-  ? selectedMessageType === 'all'
-    ? jsonData.slice(0, visibleItems)
-    : jsonData
-        .filter((row) => {
-          const messageTypePrefixes = {
-            error: '[ERROR]',
-            warn: '[WARN]',
-            trace: '[TRACE]',
-            debug: '[DEBUG]',
-            info: '[INFO]',
-            fatal: '[FATAL]',
-          };
-          return row.log.includes(messageTypePrefixes[selectedMessageType]);
-        })
-        .slice(0, visibleItems)
-  : [];
+  // const filteredData = jsonData
+  // ? selectedMessageType === 'all'
+  //   ? jsonData.slice(0, visibleItems)
+  //   : jsonData
+  //       .filter((row) => {
+  //         const messageTypePrefixes = {
+  //           error: '[ERROR]',
+  //           warn: '[WARN]',
+  //           trace: '[TRACE]',
+  //           debug: '[DEBUG]',
+  //           info: '[INFO]',
+  //           fatal: '[FATAL]',
+  //         };
+  //         return row.log.includes(messageTypePrefixes[selectedMessageType]);
+  //       })
+  //       .slice(0, visibleItems)
+  // : [];
 
 
   const truncateUserId = (userId) => {
@@ -158,6 +209,22 @@ export default function Ourdata() {
   };
   
   const isEndOfFile = visibleItems >= filteredData.length;
+
+
+  const saveBookmarksToLocalStorage = (bookmarks) => {
+    localStorage.setItem('bookmarkedEntries', JSON.stringify(bookmarks));
+  };
+
+  const handleBookmarkClick = (date) => {
+  const updatedBookmarks = isBookmarked(date)
+      ? bookmarkedEntries.filter((entry) => entry !== date)
+      : [...bookmarkedEntries, date];
+    setBookmarkedEntries(updatedBookmarks);
+    saveBookmarksToLocalStorage(updatedBookmarks);
+  };
+
+  const isBookmarked = (date) => bookmarkedEntries.includes(date);
+
   
   return (
     <div className="overflow-x-auto">
@@ -181,6 +248,9 @@ export default function Ourdata() {
                 {type.charAt(0).toUpperCase() + type.slice(1)} ({messageTypeCounts[type]})
               </Dropdown.Item>
             ))}
+            <Dropdown.Item value="bookmarks" onClick={() => handleMessageTypeChange({ target: { value: 'bookmarks' } })}>
+              Bookmarks ({bookmarkedEntries.length})
+            </Dropdown.Item>
             </Dropdown>
       </div>
 
@@ -211,19 +281,31 @@ export default function Ourdata() {
                 <Table.Cell>
                   <div className="flex items-center space-x-1">
                     <Tooltip content="Delete entry (disabled)">
-                      <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
-                      </svg>
-                      </Tooltip>
-                    <Tooltip content="Bookmark for follow-up (disabled)">
-                      <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z"/>
-                      </svg>
+                      <button>
+                        <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                        </svg>
+                      </button>
+                    </Tooltip>
+                    <Tooltip content="Bookmark for review">
+                      <button onClick={() => handleBookmarkClick(row.date)}>
+                      {isBookmarked(row.date) ? (
+                          <svg className="w-6 h-6 text-orange-700 dark:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                          <path d="M13 20a1 1 0 0 1-.64-.231L7 15.3l-5.36 4.469A1 1 0 0 1 0 19V2a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v17a1 1 0 0 1-1 1Z"/>
+                        </svg>
+                        ) : (
+                          <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 20">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m13 19-6-5-6 5V2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17Z"/>
+                          </svg>
+                      )}
+                      </button>
                     </Tooltip>
                     <Tooltip content="Archive this entry (disabled)">
-                    <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                      <path stroke="currentColor" strokeLinejoin="round" strokeWidth="1" d="M8 8v1h4V8m4 7H4a1 1 0 0 1-1-1V5h14v9a1 1 0 0 1-1 1ZM2 1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z"/>
-                    </svg>
+                      <button>
+                        <svg className="w-6 h-6 text-gray-800 dark:text-white hover:text-orange-700 dark:hover:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                          <path stroke="currentColor" strokeLinejoin="round" strokeWidth="1" d="M8 8v1h4V8m4 7H4a1 1 0 0 1-1-1V5h14v9a1 1 0 0 1-1 1ZM2 1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z"/>
+                        </svg>
+                    </button>
                     </Tooltip>
                   </div>
                 </Table.Cell>
