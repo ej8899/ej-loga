@@ -46,13 +46,17 @@ function App() {
         
       <div className="m-8">
         <Ournavbar/>
+        
         <div className="h-10"></div>
-        <Summaries/>
-        <div className="h-10"></div>
-
+        
         <Alert className="warning-message mb-6" color="failure" icon={HiInformationCircle}>
           This website is best viewed on larger screens. Please use a larger device for a better experience.
         </Alert>
+
+        <Summaries/>
+        <div className="h-10"></div>
+
+ 
 
         <Ourdata/>
         <div className="h-10"></div>
