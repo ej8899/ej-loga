@@ -8,6 +8,8 @@ import { Flowbite } from 'flowbite-react';
 import logger from './logger';
 import ScrollToTopButton from './ScrollTop';
 
+import { Alert } from 'flowbite-react';
+import { HiInformationCircle } from 'react-icons/hi';
 
 const generateUUID = () => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -47,6 +49,11 @@ function App() {
         <div className="h-10"></div>
         <Summaries/>
         <div className="h-10"></div>
+
+        <Alert className="warning-message mb-6" color="failure" icon={HiInformationCircle}>
+          This website is best viewed on larger screens. Please use a larger device for a better experience.
+        </Alert>
+
         <Ourdata/>
         <div className="h-10"></div>
         <Ourfooter/>
