@@ -76,16 +76,17 @@ export default function Summaries() {
 
 
   return (
-    <div className="flex justify-end space-x-4 justify-center">
+    <div className="flex flex-wrap justify-center ">
 
-      <LogChart data={data}/>
-      
-      <ServerChart data={data}/>
-
-      <TrafficChart data={data}/>
-
-      <VisitorChart data={data}/>
-
-    </div>
+    <LogChart data={data} className="m-4" />
+    
+    <ServerChart data={data} className="m-4" />
+  
+    <TrafficChart data={data} className="m-4" />
+  
+    <VisitorChart data={data} className="m-4" />
+  
+  </div>
+  
   );
 }
