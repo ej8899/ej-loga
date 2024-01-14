@@ -34,6 +34,7 @@ const downloadCSV = (dateCounts) => {
 
 
 export default function LogChart({data}) {
+  const [chartTotals, setChartTotals] = useState(0);
   const [chartData, setChartData] = useState({
     series: [0,0,0,0,0],
     
@@ -145,10 +146,6 @@ export default function LogChart({data}) {
   });
 
 
-  const handleDownloadClick = () => {
-    downloadCSV(data);
-  };
-
   // useEffect(() => {
   //   // TODO fetch our summary data and update here
   //   const newSeries = [40, 50, 30, 710,23,12];
@@ -159,6 +156,14 @@ export default function LogChart({data}) {
     if (data) {
       // Extract the required data for the chart
       const levelsData = Object.values(data.log_levels_count);
+      let allDataCount = 0;
+      allDataCount += levelsData[0];
+      allDataCount += levelsData[1];
+      allDataCount += levelsData[2];
+      allDataCount += levelsData[3];
+      allDataCount += levelsData[4];
+      allDataCount += levelsData[5];
+      setChartTotals(allDataCount);
       levelsData.splice(1,1);
       // Update the chart series with the new data
       setChartData((prevChartData) => ({
@@ -207,9 +212,16 @@ export default function LogChart({data}) {
   
     <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
   
-    <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-4">
-     &nbsp;
-    </div>
+
+    <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+        <div className="flex justify-between items-center pt-5">
+          
+          <div className='text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 pt-4dark:hover:text-white' >
+          Total Log Entries: {chartTotals}
+          </div>
+
+        </div>
+      </div>
   </div>
   );
 }
