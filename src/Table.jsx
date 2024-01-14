@@ -44,12 +44,18 @@ export default function Ourdata() {
 
         // Retrieve the Content-Length header from the response
         // const contentLengthHeader = response.headers.get("Content-Length");
-        const jsonString = JSON.stringify(data);
+
+        const invalidRecords = data.filter((row) => !row.date || !row.userId);
+        if (invalidRecords.length > 0) {
+          console.warn('Warning: Records with blank date or userId found:', invalidRecords);
+        }
+        const sanitizedData = data.filter((row) => row.date && row.userId);
+
+        const jsonString = JSON.stringify(sanitizedData);
         const dataSizeInBytes = new Blob([jsonString]).size;        
-        // const dataSizeInBytes = contentLengthHeader ? parseInt(contentLengthHeader, 10) : 0;
         const dataSizeInKB = dataSizeInBytes / 1024;
-        
-        setJsonData(data.reverse());
+
+        setJsonData(sanitizedData.reverse());
         setSelectedMessageType('all');
         //setFilteredData(data.reverse());
 
@@ -57,6 +63,9 @@ export default function Ourdata() {
         // console.log("SAMPLE:",data[0])
         // console.log("Data Size: ", dataSizeInKB.toFixed(2), " KB");
         logger.info('fetched data - ' + dataSizeInKB.toFixed(2) + " KB");
+
+        // Log a warning for records with blank date or userId
+
       } catch (error) {
         console.error("Error fetching data:", error.message);
         logger.error('error fetching data');
@@ -126,10 +135,10 @@ export default function Ourdata() {
   const handleLoadMore = () => {
     
     // console.log('load more clicked');
-    console.log('len jsonData:',jsonData.length)
-    console.log('len visibleItems:',visibleItems)
-    console.log('len filteredData:',filteredData.length)
-    console.log('currentPage:',currentPage)
+    // console.log('len jsonData:',jsonData.length)
+    // console.log('len visibleItems:',visibleItems)
+    // console.log('len filteredData:',filteredData.length)
+    // console.log('currentPage:',currentPage)
 
     const remainingItems = filteredData.length - visibleItems;
     const itemsToLoad = Math.min(itemsPerPage, remainingItems);
