@@ -61,7 +61,7 @@ export default function Summaries() {
 
         if (response.ok) {
           const jsonData = await response.json();
-          console.log('fetched summary data')
+          // console.log('fetched summary data')
           setData(jsonData);
         } else {
           console.error('Failed to fetch data:', response.statusText);
