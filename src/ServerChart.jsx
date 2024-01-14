@@ -7,6 +7,108 @@ import Chart from 'react-apexcharts'
 
 
 export default function ServerChart({data}) {
+  const [barBrowserData, setBrowserBarData] = useState({
+    options: {
+      chart: {
+        stacked: true,
+        stackType: "100%",
+        type: 'bar',
+        toolbar: {
+          show: false
+        },
+        margin: 0,
+        height: 550,
+        
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          // borderRadiusApplication: "around",
+          // borderRadiusWhenStacked: 'all',
+          // borderRadius: 6,
+          barHeight: '20%'
+        },
+        ticks: {
+          position: 'top',
+          show: false
+        },
+      },
+      xaxis: {
+        //categories: ['category A', ]
+        labels: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        },
+        lines: {
+          show: false,
+        },
+        ticks: {
+          show: false
+        },
+        grid: {
+          show: false,
+        },
+        axisTicks: {
+          show: false // Add this to hide the x-axis ticks
+        },
+        categories: ["web browser: "],
+        tooltip: {
+          enabled: true,
+          fillSeriesColor: false,
+          // color: 'red',
+          // style: {
+          //   color: 'red',
+          // },
+          x: {
+            color: 'yellow',
+            show: false,
+          },
+          onDatasetHover: {
+            highlightDataSeries: false,
+        }
+        },
+      },
+      yaxis: {
+        labels: {
+          show: false
+        },
+        lines: {
+          show: false,
+        },
+      },
+      series: [
+        {
+          name: 'Chrome',
+          data: [1]
+        },
+        {
+          name: 'Firefox',
+          data: [1]
+        },
+        {
+          name: 'Safari',
+          data: [1]
+        },
+        {
+          name: 'Other',
+          data: [1],
+        }
+        // Add more series as needed
+      ],
+      legend: {
+        show: false,
+      },
+      grid: {
+        show: false,
+      },
+      ticks: {
+        show: false,
+      },
+    }
+  });
+
   const [chartData, setChartData] = useState({
     series: [0,1,],
     
@@ -117,7 +219,25 @@ export default function ServerChart({data}) {
   useEffect(() => {
     if (data) {
       // Extract the required data for the chart
+      const seriesData = data.environment_summary[2];
       
+      
+      const browsers = Object.keys(seriesData);
+      
+      setBrowserBarData({
+        options: {
+          ...barBrowserData.options,
+          xaxis: {
+            ...barBrowserData.options.xaxis,
+            categories: ["web browser:"],
+          },
+          series: browsers.map((browser) => ({
+            name: browser,
+            data: [seriesData[browser]],
+          })),
+        },
+      });
+
       setChartData((prevChartData) => ({ ...prevChartData, 
         series: [ parseInt(data.environment_summary[0].Desktop/data.unique_visitors),
                   parseInt(data.environment_summary[0].Mobile/data.unique_visitors)
@@ -154,8 +274,10 @@ export default function ServerChart({data}) {
   
     <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
   
-    <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-4">
-      &nbsp;
+    <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
+    <div style={{ height: '40px', marginLeft: '-10px', marginTop: '-110px' }}>
+      <Chart options={barBrowserData.options} series={barBrowserData.options.series} type="bar" width="320" />
+    </div>
     </div>
   </div>
   );
