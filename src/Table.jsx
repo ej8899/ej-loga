@@ -17,7 +17,7 @@ import logger from './logger';
 
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
-  const [selectedMessageType, setSelectedMessageType] = useState('all');
+  const [selectedMessageType, setSelectedMessageType] = useState('SELECT');
   const [visibleItems, setVisibleItems] = useState(20); // Initial number of items to display
   const [messageTypeCounts, setMessageTypeCounts] = useState({}); // State to store message type counts
   const [loadMoreCount, setLoadMoreCount] = useState(1); // New state to track load more count
@@ -57,7 +57,7 @@ export default function Ourdata() {
         const dataSizeInKB = dataSizeInBytes / 1024;
 
         setJsonData(sanitizedData.reverse());
-        setSelectedMessageType('all');
+        setSelectedMessageType('SELECT');
         //setFilteredData(data.reverse());
 
         setVisibleItems((prevVisibleItems) => Math.min(prevVisibleItems, data.length));
@@ -158,18 +158,15 @@ export default function Ourdata() {
   const currentVisibleItems = filteredData.slice(startIndex, endIndex);
 
   const handleMessageTypeChange = (event) => {
-    setSelectedMessageType(event.target.value);
-    setLoadMoreCount(1);
-  
     const selectedType = event.target.value;
 
-    if (selectedType === 'bookmarks') {
-      setFilteredData(bookmarkedEntries.map(date => jsonData.find(row => row.date === date)));
+    if (selectedType === 'all') {
+      setFilteredData(jsonData);
     } else {
       setFilteredData(() => {
         return jsonData
-          ? selectedType === 'all'
-            ? jsonData
+          ? selectedType === 'bookmarks'
+            ? jsonData.filter((row) => isBookmarked(row.date))
             : jsonData.filter((row) => {
                 const messageTypePrefixes = {
                   error: '[ERROR]',
@@ -183,28 +180,12 @@ export default function Ourdata() {
               })
           : [];
       });
-
-      // setTotalPages(() => parseInt(filteredData.length/itemsPerPage) + 1);
-      // if(totalPages > 1 ) { 
-      //   setLoadMoreVisible(true);
-      // } else {
-      //   setLoadMoreVisible(false);
-      // }
-      // //numPages = parseInt(filteredData.length / itemsPerPage) + 1;
-      // //setTotalPages((prevTotalPages) => Math.min(prevVisibleItems, data.length));
-      // console.log('\ntotalPages:',totalPages)
-
-      // console.log('len jsonData:',jsonData.length)
-      // console.log('len visibleItems:',visibleItems)
-      // console.log('len filteredData:',filteredData.length)
-      // console.log('currentPage:',currentPage)
     }
 
     // Reset current page to 1 when changing message type
     setCurrentPage(1);
-    setVisibleItems(20);
-    // const lessThanItemsPerPage = currentVisibleItems.length < itemsPerPage;
-    // setLoadMoreVisible(!lessThanItemsPerPage);
+    setLoadMoreVisible(true); // Reset the visibility of the Load More button
+    setSelectedMessageType(selectedType);
   };
 
   useEffect(() => {
@@ -214,24 +195,6 @@ export default function Ourdata() {
     setLoadMoreVisible(!lessThanItemsPerPage && !allItemsDisplayed);
   }, [filteredData, currentVisibleItems, visibleItems]);
 
-  // const filteredData = jsonData
-  // ? selectedMessageType === 'all'
-  //   ? jsonData.slice(0, visibleItems)
-  //   : jsonData
-  //       .filter((row) => {
-  //         const messageTypePrefixes = {
-  //           error: '[ERROR]',
-  //           warn: '[WARN]',
-  //           trace: '[TRACE]',
-  //           debug: '[DEBUG]',
-  //           info: '[INFO]',
-  //           fatal: '[FATAL]',
-  //         };
-  //         return row.log.includes(messageTypePrefixes[selectedMessageType]);
-  //       })
-  //       .slice(0, visibleItems)
-  // : [];
-
 
   const truncateUserId = (userId) => {
     if(!userId) return 'uid unknown';
@@ -239,18 +202,52 @@ export default function Ourdata() {
     return userId.length > maxLength ? `...${userId.slice(-maxLength)}` : userId;
   };
 
+  const environmentLookup = {
+    Chrome: '<i class="fa-brands fa-chrome fa-lg"></i>', 
+    Safari: '<i class="fa-brands fa-safari fa-lg"></i>',
+    Firefox: '<i class="fa-brands fa-firefox fa-lg"></i>',
+
+    MacIntel: '<i class="fa-brands fa-apple fa-xl"></i>',
+    Win32: '<i class="fa-brands fa-windows fa-lg"></i>',
+    'Linux x86_64': '<i class="fa-brands fa-linux fa-lg"></i>',
+    'Linux armv81': '<i class="fa-brands fa-android fa-lg"></i>',
+    'Linux armv8l': '<i class="fa-brands fa-android fa-lg"></i>',
+
+    Desktop: '<i class="fa-solid fa-laptop fa-lg"></i>',
+    Mobile: ' ',
+    iPhone: '<i class="fa-solid fa-mobile fa-lg"></i>',
+    Tablet: '<i class="fa-solid fa-tablet fa-lg"></i>',
+    iPad: '<i class="fa-solid fa-tablet fa-lg"></i>'
+  };
+
   const renderCellValue = (value) => {
     if (typeof value === 'object') {
-      // If the value is an object, display its properties
-      return Object.keys(value).map((key) => (
-        <div key={key}>
-          <strong>{key}:</strong> {value[key]}
+      // If the value is an object - it's our environment details
+      return (
+        <div className='flex flex-row'>
+          {Object.keys(value).map((key) => (
+            <div key={key} className='flex items-center p-1' style={{ flex: '1' }}>
+              {/* You can customize the styling here */}
+              {key === 'version' ? (
+                <Tooltip content={`Version: ${value[key]}`} placement='bottom'>
+                  <span className='text-xs'>v.{value[key]}</span>
+                </Tooltip>
+              ) : (
+                <Tooltip content={value[key]} placement='bottom'>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: environmentLookup[value[key]] || value[key] }}
+                  />
+                </Tooltip>
+              )}
+            </div>
+          ))}
         </div>
-      ));
+      );
     }
     // Otherwise, display the value as-is
     return value;
   };
+  
 
   const cleanLogMessage = (logMessage) => {
     const messageTypeStyles = {
@@ -377,7 +374,9 @@ export default function Ourdata() {
                   dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} 
                 />
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
-                <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
+                
+                <Table.Cell
+                >{renderCellValue(row.environment)}</Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center space-x-1">
                     <Tooltip content="Delete entry (disabled)">
