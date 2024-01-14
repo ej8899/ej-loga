@@ -35,11 +35,13 @@ const downloadCSV = (dateCounts) => {
 
 export default function LogChart({data}) {
   const [chartData, setChartData] = useState({
-    series: [0,1,2,3,0,0],
+    series: [0,0,0,0,0],
     
     options: {
       // colors: ["#1C64F2", "#16BDCA", "#FDBA8C", "#E74694","teal","orange"],
-      colors: ["#1C64F2", "#16BDCA", "#FFA500", "#E74694",'#FFFF00','#A020F0','orange'],
+      colors: ["#FCD34Dcc", "#EF4444cc", "#A855F7cc", "#818CF8cc",'#03a9f4cc','#A020F0','orange'],
+              // warnings, errors,    fatal,      debug, trace
+              // chart for hex to transparency %: https://stackoverflow.com/questions/23201134/transparent-argb-hex-value
       tooltip: {
         enabled: true,
         fillSeriesColor: false,
@@ -100,8 +102,8 @@ export default function LogChart({data}) {
           top: -2,
         },
       },
-      labels: ["warnings", "info", "errors\n", "fatal",'debug','trace'],
-      
+      labels: ["warnings", "errors\n", "fatal",'debug','trace'],
+      // info was item 1
       legend: {
         position: "bottom",
         fontFamily: "Poppins, sans-serif",
@@ -157,7 +159,7 @@ export default function LogChart({data}) {
     if (data) {
       // Extract the required data for the chart
       const levelsData = Object.values(data.log_levels_count);
-
+      levelsData.splice(1,1);
       // Update the chart series with the new data
       setChartData((prevChartData) => ({
         ...prevChartData,
