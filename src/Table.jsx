@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-import { Button, Spinner } from 'flowbite-react';
+import { Button, Spinner, Pagination } from 'flowbite-react';
 import { Table, Dropdown } from 'flowbite-react';
 import { Label, Tooltip } from 'flowbite-react';
 
@@ -13,6 +13,7 @@ import logger from './logger';
 // TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
 
 
+
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
   const [selectedMessageType, setSelectedMessageType] = useState('all');
@@ -21,9 +22,11 @@ export default function Ourdata() {
   const [loadMoreCount, setLoadMoreCount] = useState(1); // New state to track load more count
   const [bookmarkedEntries, setBookmarkedEntries] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  
+  const [isLoadMoreVisible, setLoadMoreVisible] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(100);
 
-  let loadMoreButton = true;
+  let numPages = 100;
 
   useEffect(() => {
     // load data from API
@@ -47,7 +50,6 @@ export default function Ourdata() {
         const dataSizeInKB = dataSizeInBytes / 1024;
         
         setJsonData(data.reverse());
-        //setFilteredData(data.reverse());
         setSelectedMessageType('all');
         //setFilteredData(data.reverse());
 
@@ -68,19 +70,9 @@ export default function Ourdata() {
     }
 
     fetchData();
+
   }, []);
 
-  // useEffect(() => {
-  //   // Calculate message type counts when jsonData changes
-  //   if (jsonData) {
-  //     const counts = jsonData.reduce((accumulator, row) => {
-  //       const messageType = getMessageType(row.log);
-  //       accumulator[messageType] = (accumulator[messageType] || 0) + 1;
-  //       return accumulator;
-  //     }, {});
-  //     setMessageTypeCounts(counts);
-  //   }
-  // }, [jsonData]);
 
   useEffect(() => {
     // Calculate message type counts when jsonData changes
@@ -94,7 +86,24 @@ export default function Ourdata() {
     }
   }, [jsonData]);
 
+  // useEffect(() => {
+  //   // Trigger load more when filteredData changes
+  //   //handleLoadMore();
+  //   setTotalPages(() => parseInt(filteredData.length/itemsPerPage) + 1);
+  //     if(totalPages > 1 ) { 
+  //       setLoadMoreVisible(true);
+  //     } else {
+  //       setLoadMoreVisible(false);
+  //     }
+  //     //numPages = parseInt(filteredData.length / itemsPerPage) + 1;
+  //     //setTotalPages((prevTotalPages) => Math.min(prevVisibleItems, data.length));
+  //     console.log('\ntotalPages:',totalPages)
 
+  //     console.log('len jsonData:',jsonData.length)
+  //     console.log('len visibleItems:',visibleItems)
+  //     console.log('len filteredData:',filteredData.length)
+  //     console.log('currentPage:',currentPage)
+  // }, [filteredData]);
   
 
 
@@ -108,69 +117,92 @@ export default function Ourdata() {
     return 'unknown';
   };
 
-
-  const handleLoadMore = () => {
-    // Increase visible items by 20 on each "Load More" click
-    if((loadMoreCount * 20) > jsonData.length) {
-      loadMoreButton = false;
-      return;
-    }
-    setVisibleItems((prevVisibleItems) => prevVisibleItems + 20);
-    setLoadMoreCount((prevCount) => prevCount + 1);
-    //console.log('load more count:',loadMoreCount)
+  // const onPageChange = (page) => setCurrentPage(page);
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+    setVisibleItems(page * itemsPerPage); // Adjust visible items based on the current page
   };
 
-  // const handleMessageTypeChange = (event) => {
-  //   // console.log("event.target.value:", event.target.value);
-  //   if((20) > filteredData.length) {
-  //     loadMoreButton = false;
-  //   } else {
-  //     loadMoreButton = true;
-  //   }
+  const handleLoadMore = () => {
     
-  //   setVisibleItems(20);
-  //   setLoadMoreCount(1);
-  //   setSelectedMessageType(event.target.value);
-  //   console.log(loadMoreButton)
-  // };
+    // console.log('load more clicked');
+    console.log('len jsonData:',jsonData.length)
+    console.log('len visibleItems:',visibleItems)
+    console.log('len filteredData:',filteredData.length)
+    console.log('currentPage:',currentPage)
+
+    const remainingItems = filteredData.length - visibleItems;
+    const itemsToLoad = Math.min(itemsPerPage, remainingItems);
+  
+    const newPage = currentPage + 1;
+    setCurrentPage(newPage);
+    setVisibleItems((prevVisibleItems) => prevVisibleItems + itemsToLoad);
+    if (remainingItems <= itemsPerPage) {
+      setLoadMoreVisible(false);
+    }
+  };
+
+  const itemsPerPage = 20;
+  const startIndex = 0;
+  const endIndex = visibleItems;
+  const currentVisibleItems = filteredData.slice(startIndex, endIndex);
 
   const handleMessageTypeChange = (event) => {
-    if ((20) > filteredData.length) {
-      loadMoreButton = false;
-    } else {
-      loadMoreButton = true;
-    }
-
     setSelectedMessageType(event.target.value);
-    setVisibleItems(20);
     setLoadMoreCount(1);
-
+  
     const selectedType = event.target.value;
 
     if (selectedType === 'bookmarks') {
       setFilteredData(bookmarkedEntries.map(date => jsonData.find(row => row.date === date)));
     } else {
-      setFilteredData(
-        jsonData
+      setFilteredData(() => {
+        return jsonData
           ? selectedType === 'all'
-            ? jsonData.slice(0, visibleItems)
-            : jsonData
-                .filter((row) => {
-                  const messageTypePrefixes = {
-                    error: '[ERROR]',
-                    warn: '[WARN]',
-                    trace: '[TRACE]',
-                    debug: '[DEBUG]',
-                    info: '[INFO]',
-                    fatal: '[FATAL]',
-                  };
-                  return row.log.includes(messageTypePrefixes[selectedType]);
-                })
-                .slice(0, visibleItems)
-          : []
-      );
+            ? jsonData
+            : jsonData.filter((row) => {
+                const messageTypePrefixes = {
+                  error: '[ERROR]',
+                  warn: '[WARN]',
+                  trace: '[TRACE]',
+                  debug: '[DEBUG]',
+                  info: '[INFO]',
+                  fatal: '[FATAL]',
+                };
+                return row.log.includes(messageTypePrefixes[selectedType]);
+              })
+          : [];
+      });
+
+      // setTotalPages(() => parseInt(filteredData.length/itemsPerPage) + 1);
+      // if(totalPages > 1 ) { 
+      //   setLoadMoreVisible(true);
+      // } else {
+      //   setLoadMoreVisible(false);
+      // }
+      // //numPages = parseInt(filteredData.length / itemsPerPage) + 1;
+      // //setTotalPages((prevTotalPages) => Math.min(prevVisibleItems, data.length));
+      // console.log('\ntotalPages:',totalPages)
+
+      // console.log('len jsonData:',jsonData.length)
+      // console.log('len visibleItems:',visibleItems)
+      // console.log('len filteredData:',filteredData.length)
+      // console.log('currentPage:',currentPage)
     }
+
+    // Reset current page to 1 when changing message type
+    setCurrentPage(1);
+    setVisibleItems(20);
+    // const lessThanItemsPerPage = currentVisibleItems.length < itemsPerPage;
+    // setLoadMoreVisible(!lessThanItemsPerPage);
   };
+
+  useEffect(() => {
+    // Update Load More visibility when filteredData or visibleItems change
+    const lessThanItemsPerPage = currentVisibleItems.length < itemsPerPage;
+    const allItemsDisplayed = visibleItems >= filteredData.length;
+    setLoadMoreVisible(!lessThanItemsPerPage && !allItemsDisplayed);
+  }, [filteredData, currentVisibleItems, visibleItems]);
 
   // const filteredData = jsonData
   // ? selectedMessageType === 'all'
@@ -192,6 +224,7 @@ export default function Ourdata() {
 
 
   const truncateUserId = (userId) => {
+    if(!userId) return 'uid unknown';
     const maxLength = 10;
     return userId.length > maxLength ? `...${userId.slice(-maxLength)}` : userId;
   };
@@ -305,9 +338,10 @@ export default function Ourdata() {
       </div>
 
       {jsonData ? (
-        filteredData.length > 0 ? (
-        <Table hoverable className=''>
-          <Table.Head className='bg-slate-500 dark:bg-gray-800'>
+        currentVisibleItems.length > 0 ? (
+        <Table hoverable className='' >
+          <Table.Head className='bg-slate-500 dark:bg-gray-800 '>
+            <Table.HeadCell>Row</Table.HeadCell>
             <Table.HeadCell>Date</Table.HeadCell>
             <Table.HeadCell>Type</Table.HeadCell>
             <Table.HeadCell>Log Message</Table.HeadCell>
@@ -317,17 +351,21 @@ export default function Ourdata() {
               <span className="sr-only">Edit</span>
             </Table.HeadCell>
           </Table.Head>
-          <Table.Body className="divide-y">
-            {filteredData.slice().map((row, rowIndex) => (
+          <Table.Body className="divide-y ">
+            {currentVisibleItems.slice().map((row, rowIndex) => (
               <Table.Row
                 key={rowIndex}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
+                <Table.Cell>{rowIndex + 1 }</Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {row.date}
                 </Table.Cell>
                 <Table.Cell>{renderPill(row.log)}</Table.Cell>
-                <Table.Cell dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} />
+                <Table.Cell 
+                  className="w-full"
+                  dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} 
+                />
                 <Table.Cell>{truncateUserId(row.userId)}</Table.Cell>
                 <Table.Cell>{renderCellValue(row.environment)}</Table.Cell>
                 <Table.Cell>
@@ -367,28 +405,31 @@ export default function Ourdata() {
         </Table>
         
         ) : (
-          <div className="text-center">
+          <div className="text-center text-gray-800 dark:text-white">
             <p>No matching data found.</p>
           </div>
         )
       ) : (
-        <div className="text-center">
+        <div className="text-center text-gray-800 dark:text-white">
           <Spinner aria-label="Loading log data..." size="xl" />
           <br />
           Loading Data...
         </div>
       )}
 
-        {jsonData && (
-          <div className="text-center mt-4">
-            <button
-              onClick={handleLoadMore}
-              className="p-2 rounded-xl bg-blue-500 text-white"
-            >
-              Load More...
-            </button>
-          </div>
-        )}
+      {jsonData && isLoadMoreVisible && (
+        <div className="text-center mt-0">
+          <button
+            onClick={handleLoadMore}
+            className="p-2 mt-4 rounded-xl bg-blue-500 text-white"
+          >
+            Load More...
+          </button>
+          {/* <div className="flex overflow-x-auto sm:justify-center">
+            <Pagination layout="navigation" currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} showIcons />
+          </div> */}
+        </div>
+      )}
       
     </div>
     </div>
