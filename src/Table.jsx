@@ -2,9 +2,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-import { Button, Spinner, Pagination } from 'flowbite-react';
+import { Button, Spinner, } from 'flowbite-react';
 import { Table, Dropdown } from 'flowbite-react';
 import { Label, Tooltip } from 'flowbite-react';
+import { HiOutlineArrowDown,  } from 'react-icons/hi';
 
 import logger from './logger';
 
@@ -427,16 +428,14 @@ export default function Ourdata() {
       )}
 
       {jsonData && isLoadMoreVisible && (
-        <div className="text-center mt-0">
-          <button
+        <div className="flex text-center mt-0 justify-center">
+          <Button
             onClick={handleLoadMore}
             className="p-2 mt-4 rounded-xl bg-blue-500 text-white"
           >
-            Load More...
-          </button>
-          {/* <div className="flex overflow-x-auto sm:justify-center">
-            <Pagination layout="navigation" currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} showIcons />
-          </div> */}
+            Load More&nbsp;&nbsp;
+            <HiOutlineArrowDown className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       )}
       
