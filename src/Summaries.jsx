@@ -81,8 +81,6 @@ export default function Summaries() {
     <ServerSummary data={data.python_version} />
 
     <div className="flex flex-wrap justify-center ">
-
-    
     
     <LogChart data={data} className="m-4" />
     
