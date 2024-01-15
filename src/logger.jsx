@@ -15,7 +15,7 @@ class Logger {
   constructor(name, serverUrl = 'https://erniejohnson.ca/cgi-bin/log.py') {
     this.name = name;
     this.level = logLevels.INFO; // Default log level
-    this.consoleOutput = false; // show log messages in console?
+    this.consoleOutput = true; // show log messages in console?
     this.serverSend = true; // send logMessage to server for actual logging
     this.serverUrl = serverUrl;
   }
@@ -149,6 +149,6 @@ class Logger {
 }
 
 const logger = new Logger('LOGA');
-logger.toggleConsoleLog(false);
+logger.toggleConsoleLog(true);
 
 export default logger;
