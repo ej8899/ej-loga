@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import './App.css'
-import Ourfooter from './Footer'
-import Ournavbar from './Navbar'
+import './App.css';
+import Ourfooter from './Footer';
+import Ournavbar from './Navbar';
 import Summaries from './Summaries';
-import Ourdata from './Table'
+import Ourdata from './Table';
 import { Flowbite } from 'flowbite-react';
 import logger from './logger';
 import ScrollToTopButton from './ScrollTop';
@@ -49,7 +49,7 @@ function App() {
         
         <div className="h-10"></div>
         
-        <Alert className="warning-message mb-6" color="failure" icon={HiInformationCircle}>
+        <Alert className="warning-message mb-6 lg:hidden" color="failure" icon={HiInformationCircle}>
           This website is best viewed on larger screens. Please use a larger device for a better experience.
         </Alert>
 
