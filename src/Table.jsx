@@ -255,7 +255,7 @@ export default function Ourdata() {
       '[WARN]': 'text-orange-500',
       '[TRACE]': 'text-blue-700',
       '[DEBUG]': 'text-blue-400',
-      // '[INFO]': 'text-green-500',
+      '[INFO]': '',
       '[FATAL]': 'text-red-500',
     };
   
