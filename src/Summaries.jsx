@@ -6,6 +6,7 @@ import VisitorChart from './VisitorChart';
 import ServerChart from './ServerChart';
 import LogChart from './LogChart';
 import ServerSummary from './ServerSummary';
+import ServerSettings from './Settings';
 
 const defaultData = {
   python_version: "3.6.8 (default, Nov 14 2023, 16:29:52) \n[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)]",
@@ -79,7 +80,7 @@ export default function Summaries() {
   return (
     <div>
     <ServerSummary data={data.python_version} />
-
+    <ServerSettings data={data.python_version}  />
     <div className="flex flex-wrap justify-center ">
     
     <LogChart data={data} className="m-4" />
