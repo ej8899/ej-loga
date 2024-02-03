@@ -58,7 +58,7 @@ export default function Ourdata() {
 
         setJsonData(sanitizedData.reverse());
         setSelectedMessageType('SELECT');
-        //setFilteredData(data.reverse());
+        setFilteredData(data.reverse());
 
         setVisibleItems((prevVisibleItems) => Math.min(prevVisibleItems, data.length));
         // console.log("SAMPLE:",data[0])
