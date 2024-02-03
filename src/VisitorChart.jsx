@@ -121,34 +121,17 @@ const calculateTrafficChange = () => {
   }
 };
 
-// useEffect(() => {
-//     if (data && data.date_counts) {
-//       calculateTrafficChange();
-//       // Extract the required data for the chart
-//       const dates = Object.keys(data.date_counts);
-//       const visitorsData = dates.map((date) => data.date_counts[date]);
-
-//       // Update the chart series with the new data
-//       setChartData((prevChartData) => ({
-//         ...prevChartData,
-//         series: [{ name: 'visitors', data: visitorsData }],
-//         options: {
-//           ...prevChartData.options,
-//           xaxis: {
-//             ...prevChartData.options.xaxis,
-//             categories: dates,
-//           },
-//         },
-//       }));
-//     }
-//   }, [data, selectedDays]);
-
-  const updateChartData = (dates, visitorsData) => {
+  const updateChartData = (dates, visitorsData, strokeWidth = 6) => {
+    
     setChartData((prevChartData) => ({
       ...prevChartData,
       series: [{ name: 'visitors', data: visitorsData }],
       options: {
         ...prevChartData.options,
+        stroke: {
+          ...prevChartData.options.stroke,
+          width: strokeWidth,
+        },
         xaxis: {
           ...prevChartData.options.xaxis,
           categories: dates,
@@ -233,7 +216,7 @@ const calculateTrafficChange = () => {
               visitorsDataLast30Days.push(count);
             }
           
-            updateChartData(datesLast30Days, visitorsDataLast30Days);
+            updateChartData(datesLast30Days, visitorsDataLast30Days, 4);
             break;
           case "Last 90 Days":
             todayUTC.setUTCHours(0, 0, 0, 0);
@@ -255,7 +238,7 @@ const calculateTrafficChange = () => {
               visitorsDataLast90Days.push(count);
             }
           
-            updateChartData(datesLast90Days, visitorsDataLast90Days);
+            updateChartData(datesLast90Days, visitorsDataLast90Days,3);
             break;
           case "Last 180 Days":
             todayUTC.setUTCHours(0, 0, 0, 0);
@@ -277,7 +260,7 @@ const calculateTrafficChange = () => {
               visitorsDataLast180Days.push(count);
             }
 
-            updateChartData(datesLast180Days, visitorsDataLast180Days);
+            updateChartData(datesLast180Days, visitorsDataLast180Days,1);
             break;
 
           case "Last 365 Days":
@@ -300,7 +283,7 @@ const calculateTrafficChange = () => {
               visitorsDataLast365Days.push(count);
             }
           
-            updateChartData(datesLast365Days, visitorsDataLast365Days);
+            updateChartData(datesLast365Days, visitorsDataLast365Days,1);
             break;
             
 
