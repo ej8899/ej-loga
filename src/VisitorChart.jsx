@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 
 'use client';
-import  { useState, useEffect, useRef } from 'react';
+import  { useState, useEffect, useRef, useCallback } from 'react';
 import { Dropdown } from 'flowbite-react';
 import { Tooltip } from 'flowbite-react';
 import Chart from 'react-apexcharts'
@@ -12,7 +12,7 @@ import Chart from 'react-apexcharts'
 
 export default function VisitorChart({ data }) {
   const dropdownRef = useRef(null);
-
+console.log(data)
   const [chartData, setChartData] = useState({
     series: [{
       name: 'interactions',
@@ -105,21 +105,23 @@ export default function VisitorChart({ data }) {
 const [selectedDays, setSelectedDays] = useState('Last 7 days');
 const [trafficChange, setTrafficChange] = useState('16.3%');
 
-const calculateTrafficChange = () => {
-  const dates = Object.keys(data.date_counts);
+  const calculateTrafficChange = useCallback(() => {
+    const dates = Object.keys(data.date_counts);
 
-  // Check if data for today and yesterday exists
-  if (dates.length >= 2) {
-    const todayCount = data.date_counts[dates[dates.length - 1]];
-    const yesterdayCount = data.date_counts[dates[dates.length - 2]];
+    // Check if data for today and yesterday exists
+    if (dates.length >= 2) {
+      const todayCount = data.date_counts[dates[dates.length - 1]];
+      const yesterdayCount = data.date_counts[dates[dates.length - 2]];
 
-    const percentageChange = ((todayCount - yesterdayCount) / yesterdayCount) * 100;
-    setTrafficChange(percentageChange.toFixed(0));
-  } else {
-    setTrafficChange('-');
-    // console.log("Insufficient data for traffic change calculation.");
-  }
-};
+      const percentageChange =
+        ((todayCount - yesterdayCount) / yesterdayCount) * 100;
+      setTrafficChange(percentageChange.toFixed(0));
+    } else {
+      setTrafficChange("-");
+      // console.log("Insufficient data for traffic change calculation.");
+    }
+  }, [data]);
+
 
   const updateChartData = (dates, visitorsData, strokeWidth = 6) => {
     
@@ -148,6 +150,9 @@ const calculateTrafficChange = () => {
       let visitorsData = dates.map((date) => data.date_counts[date]);
       
       const todayUTC = new Date();
+
+      
+
       switch (selectedDays) {
         case "Last 7 Days":
           todayUTC.setUTCHours(0, 0, 0, 0);
@@ -293,26 +298,8 @@ const calculateTrafficChange = () => {
           visitorsData = dates.map((date) => data.date_counts[date]);
           updateChartData(dates, visitorsData);
       }
-
-      // You may want to modify the chart data based on the selected item
-      // For now, I'll just log a message
-      // console.log('Updating chart data for selected item:', selectedDays);
-
-      // Update the chart series with the new data
-      // setChartData((prevChartData) => ({
-      //   ...prevChartData,
-      //   series: [{ name: 'visitors', data: visitorsData }],
-      //   options: {
-      //     ...prevChartData.options,
-      //     xaxis: {
-      //       ...prevChartData.options.xaxis,
-      //       categories: dates,
-      //     },
-      //   },
-      // }));
     }
-  }, [data, selectedDays]);
-
+  }, [calculateTrafficChange, data, selectedDays]);
 
   const handleItemClick = (event) => {
     //const selectedItem = event.target.textContent;
