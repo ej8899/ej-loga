@@ -8,6 +8,7 @@ import LogChart from './LogChart';
 import ServerSummary from './ServerSummary';
 import ServerSettings from './Settings';
 
+
 const defaultData = {
   python_version: "3.6.8 (default, Nov 14 2023, 16:29:52) \n[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)]",
   log_file_size: 1,
@@ -62,8 +63,17 @@ export default function Summaries() {
 
         if (response.ok) {
           const jsonData = await response.json();
-          // console.log('fetched summary data')
-          setData(jsonData);
+
+          // Sort the date_counts data
+          const sortedDateCounts = Object.fromEntries(
+            Object.entries(jsonData.date_counts).sort((a, b) => new Date(a[0]) - new Date(b[0]))
+          );
+
+          // Update the state with sorted data
+          setData({
+            ...jsonData,
+            date_counts: sortedDateCounts,
+          });
         } else {
           console.error('Failed to fetch data:', response.statusText);
         }
@@ -80,7 +90,7 @@ export default function Summaries() {
   return (
     <div>
     <ServerSummary data={data.python_version} />
-    <ServerSettings data={data.python_version}  />
+    <ServerSettings />
     <div className="flex flex-wrap justify-center ">
     
     <LogChart data={data} className="m-4" />
