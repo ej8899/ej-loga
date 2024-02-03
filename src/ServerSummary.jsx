@@ -3,7 +3,6 @@
 'use client';
 import { Button, Tooltip } from 'flowbite-react';
 
-
 // TODO - if warnings within 24hours - change button to orange w. CAUTION
 
 export default function ServerSummary({data}) {
@@ -26,8 +25,9 @@ export default function ServerSummary({data}) {
         <Button color="success" pill className="cursor-default">
           Operating OK
         </Button>
-        </Tooltip>
+        </Tooltip>  
       </div>
+      
     </div>
   </div>
 );
