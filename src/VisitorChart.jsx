@@ -12,12 +12,16 @@ import Chart from 'react-apexcharts'
 
 export default function VisitorChart({ data }) {
   const dropdownRef = useRef(null);
-console.log(data)
+  console.log(data)
+
+
   const [chartData, setChartData] = useState({
-    series: [{
+    series: [
+      {
       name: 'interactions',
-      data: [1, 2, 1, 2, 1, 2, 1]
-    }],
+      data: [1, 2, 1, 2, 1, 2, 1],
+      }, 
+    ],
     options: {
       chart: {
         foreColor: "#0099ff",
@@ -34,20 +38,20 @@ console.log(data)
       },
       dataLabels: {
         enabled: false,
-        
       },
+      
       stroke: {
-        curve: 'smooth',
-        width: 6,
-        colors: ['#FFA500'],
+        curve: ['smooth','straight'],
+        width: [6,1],
+        // colors: ['#FFA500','#008080'],
       },
       fill: {
-        type: "gradient",
+        type: ["gradient"],
         gradient: {
           opacityFrom: 1,
           opacityTo: 0.1,
-          shade: "#FFA500",
-          gradientToColors: ["#FFA500"],
+          // shade: "#FFA500",
+          // gradientToColors: ["#FFA500"],
           inverseColors: true,
         },
       },
@@ -70,7 +74,7 @@ console.log(data)
         },
         labels: {
           color: "#fff",
-          colors: ["#fff"],
+          colors: ["#fff",],
         },
       },
       xaxis: {
@@ -85,6 +89,7 @@ console.log(data)
         type: 'datetime',
         colors: ['#777'],
         color: '#777',
+        categories: [],
         // categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
       },
       tooltip: {
@@ -123,11 +128,55 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
   }, [data]);
 
 
-  const updateChartData = (dates, visitorsData, strokeWidth = 6) => {
-    
+  const calculateTrendline = (dateCounts, count) => {
+    const dates = Object.keys(dateCounts);
+    const counts = Object.values(dateCounts);
+  
+    const n = count;
+    const startIndex = dates.length - count;
+    const endIndex = dates.length;
+    const selectedDates = dates.slice(startIndex, endIndex);
+    const selectedCounts = counts.slice(startIndex, endIndex);
+  
+    const sumX = selectedDates.reduce((acc, date, index) => acc + index, 0);
+    const sumY = selectedCounts.reduce((acc, count) => acc + count, 0);
+    const sumXY = selectedDates.reduce((acc, date, index) => acc + index * selectedCounts[index], 0);
+    const sumXSquare = selectedDates.reduce((acc, date, index) => acc + index ** 2, 0);
+  
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXSquare - sumX ** 2);
+    let intercept = (sumY - slope * sumX) / n;
+  
+    // Ensure intercept is not negative
+    intercept = Math.max(0, intercept);
+  
+    // Calculate offset between trendline and interactions starting points
+    const interactionsStartDate = dates[startIndex];
+    const trendlineStartDate = selectedDates[0];
+    const offset = dates.indexOf(interactionsStartDate) - selectedDates.indexOf(trendlineStartDate);
+  
+    const trendlineData = selectedDates.map((date, index) => ({
+      x: index + offset, // Adjust x to match starting point
+      y: Math.max(0, slope * index + intercept), // Ensure y is not negative
+    }));
+  
+    return trendlineData.map((point) => Math.floor(point.y));
+  };
+  
+  
+  
+  
+
+
+  const updateChartData = (dates, visitorsData, trendlineYValues = [], trendlineItemsToShow = 7, strokeWidth = [6,2]) => {
+    const slicedTrendlineYValues = trendlineYValues.slice(-trendlineItemsToShow);
+    console.log("trendline data:",slicedTrendlineYValues);
     setChartData((prevChartData) => ({
       ...prevChartData,
-      series: [{ name: 'visitors', data: visitorsData }],
+      series: [
+        { name: 'interactions', type: 'area', data: visitorsData },
+       // { name: 'trend', type: 'line', data: [100,400,500,100,600,300,200,100,100,150,150,130,130,700]},
+       { name: 'trend', type: 'line', data: slicedTrendlineYValues },
+      ],
       options: {
         ...prevChartData.options,
         stroke: {
@@ -142,16 +191,77 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
     }));
   };
 
+  const calculateTrendLine = () => {
+    // Add some dummy trend line data for testing
+    const trendLineData = [1, 2, 3, 400, 5, 6, 7];
+    const trendLineCategories = [
+      '2024-01-01',
+      '2024-01-02',
+      '2024-01-03',
+      '2024-01-04',
+      '2024-01-05',
+      '2024-01-06',
+      '2024-01-07',
+    ];
+
+    console.log('calculing trend line')
+
+    setChartData((prevChartData) => ({
+      ...prevChartData,
+      series: [
+        {
+          name: 'interactions',
+          data: prevChartData.series[0].data,
+        },
+        {
+          name: 'trendLine',
+          data: trendLineData,
+        },
+      ],
+      options: {
+        ...prevChartData.options,
+        annotations: {
+          points: [
+            {
+              x: trendLineCategories[0],
+              y: trendLineData[0],
+              marker: {
+                size: 0,
+              },
+              label: {
+                borderColor: '#FFA500',
+                offsetY: 0,
+                style: {
+                  color: '#fff',
+                  background: '#FFA500',
+                },
+                text: 'Trend Line',
+              },
+            },
+          ],
+        },
+        xaxis: {
+          ...prevChartData.options.xaxis,
+          categories: trendLineCategories,
+        },
+      },
+    }));
+  };
+
+
+
   useEffect(() => {
     // Update the chart data based on the selected item
     if (data && data.date_counts) {
       calculateTrafficChange();
+      calculateTrendLine();
+
       let dates = Object.keys(data.date_counts);
       let visitorsData = dates.map((date) => data.date_counts[date]);
       
-      const todayUTC = new Date();
-
+      let trendlineData = calculateTrendline(data.date_counts);
       
+      const todayUTC = new Date();
 
       switch (selectedDays) {
         case "Last 7 Days":
@@ -175,7 +285,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
           }
           // console.log(datesLast7Days)
           // console.log(visitorsDataLast7Days)
-          updateChartData(datesLast7Days, visitorsDataLast7Days);
+          trendlineData = calculateTrendline(data.date_counts,7);
+          updateChartData(datesLast7Days, visitorsDataLast7Days, trendlineData, 7, [6,2]);
           break;
             
           case "Last 14 Days":
@@ -197,8 +308,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
               datesLast14Days.push(currentDate);
               visitorsDataLast14Days.push(count);
             }
-    
-            updateChartData(datesLast14Days, visitorsDataLast14Days);
+            trendlineData = calculateTrendline(data.date_counts,14);
+            updateChartData(datesLast14Days, visitorsDataLast14Days, trendlineData, 14, [6,2]);
             break;
 
           case "Last 30 Days":
@@ -220,8 +331,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
               datesLast30Days.push(currentDate);
               visitorsDataLast30Days.push(count);
             }
-          
-            updateChartData(datesLast30Days, visitorsDataLast30Days, 4);
+            trendlineData = calculateTrendline(data.date_counts,30);
+            updateChartData(datesLast30Days, visitorsDataLast30Days, trendlineData, 30, [4,1]);
             break;
           case "Last 90 Days":
             todayUTC.setUTCHours(0, 0, 0, 0);
@@ -242,8 +353,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
               datesLast90Days.push(currentDate);
               visitorsDataLast90Days.push(count);
             }
-          
-            updateChartData(datesLast90Days, visitorsDataLast90Days,3);
+            trendlineData = calculateTrendline(data.date_counts,90);
+            updateChartData(datesLast90Days, visitorsDataLast90Days, trendlineData, 90, 3);
             break;
           case "Last 180 Days":
             todayUTC.setUTCHours(0, 0, 0, 0);
@@ -264,8 +375,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
               datesLast180Days.push(currentDate);
               visitorsDataLast180Days.push(count);
             }
-
-            updateChartData(datesLast180Days, visitorsDataLast180Days,1);
+            trendlineData = calculateTrendline(data.date_counts,180);
+            updateChartData(datesLast180Days, visitorsDataLast180Days, trendlineData, 180, 1);
             break;
 
           case "Last 365 Days":
@@ -287,8 +398,8 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
               datesLast365Days.push(currentDate);
               visitorsDataLast365Days.push(count);
             }
-          
-            updateChartData(datesLast365Days, visitorsDataLast365Days,1);
+            trendlineData = calculateTrendline(data.date_counts,365);
+            updateChartData(datesLast365Days, visitorsDataLast365Days, trendlineData, 365, 1);
             break;
             
 
@@ -296,7 +407,7 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
           // Default case
           dates = Object.keys(data.date_counts);
           visitorsData = dates.map((date) => data.date_counts[date]);
-          updateChartData(dates, visitorsData);
+          updateChartData(dates, visitorsData, trendlineData, 30, 6);
       }
     }
   }, [calculateTrafficChange, data, selectedDays]);
