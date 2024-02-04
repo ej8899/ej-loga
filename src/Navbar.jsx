@@ -104,7 +104,7 @@ export default function Ournavbar() {
       <Modal.Header><h2 className="mb-0 text-4xl tracking-tight font-extrabold text-center text-gray-900 dark:text-white">About</h2></Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            <img src={aboutImage} alt="About Image" className="mx-auto" />
+            <img src={aboutImage} alt="About Image" className="mx-auto rounded-lg" />
             <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
             Our cutting-edge front-end log analysis application empowers our business to gain valuable insights into our single page application performance and user interactions. With a user-friendly interface, the application provides a comprehensive view of visitor details, allowing us to track user behavior, identify patterns, and optimize the user experience. Moreover, the application efficiently logs and reports errors and potential DoS attacks, enabling swift troubleshooting and resolution.<br/><br/>By leveraging advanced analytics and reporting features, our tool equips developers and stakeholders with the tools they need to enhance application security, stability, ensure seamless user experiences, and drive overall success in the dynamic world of web development.
             </p>
