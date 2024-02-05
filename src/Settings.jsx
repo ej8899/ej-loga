@@ -27,11 +27,11 @@ export default function ServerSettings({ data }) {
     <div className="flex flex-col justify-center items-center">
       <div className="max-w-screen-2xl w-full">
       <Accordion collapseAll className="flex flex-col rounded-xl p-2 shadow-lg border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white m-1 ">
-      <Accordion.Panel className='m-0 p-0'>
-        <Accordion.Title className='m-0 p-2'>
+      <Accordion.Panel className=' bg-white dark:bg-gray-800'>
+        <Accordion.Title className=' p-2'>
           <div className="text-lg text-gray-900 dark:text-white ">Server Settings...</div>
         </Accordion.Title>
-        <Accordion.Content>
+        <Accordion.Content className="dark:bg-grey" >
           <div className="flex flex-row gap-4 w-full">
               <label className="relative inline-flex items-center me-5 cursor-pointer">
                 <input
