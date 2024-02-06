@@ -28,9 +28,9 @@ export default function ServerSummary({data}) {
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gcc/gcc-original.svg" width='54' className='' />
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width='54' className='' />
           <div className="mx-4">
-            <p>Python Version: {pythonVersion}</p>
-            <p>GNU Compiler Collection: {osInfo}</p>
-            <p>Build Version: <span className="text-grey-400 dark:text-grey-400">{formattedBuild}</span></p>
+            <p>Python Version: <span className="text-gray-600 dark:text-gray-400 hover:text-orange-700 dark:hover:text-orange-400">{pythonVersion}</span></p>
+            <p>GNU Compiler Collection: <span className="text-gray-600 dark:text-gray-400 hover:text-orange-700 dark:hover:text-orange-400">{osInfo}</span></p>
+            <p>Build Version: <span className="text-gray-600 dark:text-gray-400 hover:text-orange-700 dark:hover:text-orange-400">{formattedBuild}</span></p>
           </div>
         </div>
 
