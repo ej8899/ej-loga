@@ -100,8 +100,9 @@ export default function Summaries() {
     <TrafficChart data={data} className="m-4" />
   
     <VisitorChart data={data} className="m-4" />
-  
-  </div>
-  </div>
+    
+    </div>
+    
+    </div>
   );
 }

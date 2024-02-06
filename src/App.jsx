@@ -54,9 +54,7 @@ function App() {
         </Alert>
 
         <Summaries/>
-        <div className="h-10"></div>
-
- 
+        {/* <div className="h-10"></div> (( there's an HR in here in Table.jsx )) */}
 
         <Ourdata/>
         <div className="h-10"></div>

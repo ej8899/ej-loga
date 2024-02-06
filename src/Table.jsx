@@ -318,7 +318,7 @@ export default function Ourdata() {
   return (
     <div className="flex flex-col justify-center items-center">
     <div className='max-w-screen-2xl w-full' >
-      
+    <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
       <div className="w-1/4 flex items-center justify-between rounded-lg shadow-lg p-4 border border-slate-600  shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 mb-2 ">
         <Label htmlFor="messageType" value="Filter Log Message Types:" className="mr-2" />
         <Dropdown 
