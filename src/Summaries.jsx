@@ -7,8 +7,12 @@ import ServerChart from './ServerChart';
 import LogChart from './LogChart';
 import ServerSummary from './ServerSummary';
 import ServerSettings from './Settings';
+import SiteTraffic from './SiteTraffic';
 
-
+//
+// stats summary API: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=stats
+// raw data API: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
+//
 const defaultData = {
   python_version: "3.6.8 (default, Nov 14 2023, 16:29:52) \n[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)]",
   log_file_size: 1,
@@ -88,21 +92,22 @@ export default function Summaries() {
 
 
   return (
-    <div>
+    <div className='flex flex-col items-center'>
     <ServerSummary data={data.python_version} />
     <ServerSettings />
-    <div className="flex flex-wrap justify-center ">
+      <div className="flex flex-wrap justify-center w-5/6 ">
+      <LogChart data={data} className="m-4" />
+      
+      <ServerChart data={data} className="m-4" />
     
-    <LogChart data={data} className="m-4" />
+      <TrafficChart data={data} className="m-4" />
     
-    <ServerChart data={data} className="m-4" />
-  
-    <TrafficChart data={data} className="m-4" />
-  
-    <VisitorChart data={data} className="m-4" />
-    
-    </div>
-    
+      <VisitorChart data={data} className="m-4" />
+      {/* <br />
+      <SiteTraffic data={data} className="m-4" /> */}
+
+      </div>
+
     </div>
   );
 }

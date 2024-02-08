@@ -29,7 +29,7 @@ export default function ServerSettings({ data }) {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center w-full">
       <div className="max-w-screen-2xl w-full">
       <Accordion collapseAll className="flex flex-col rounded-xl p-2 shadow-lg border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white m-1 ">
       <Accordion.Panel className=' bg-white dark:bg-gray-800'>
