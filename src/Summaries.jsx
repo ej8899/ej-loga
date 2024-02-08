@@ -17,6 +17,11 @@ const defaultData = {
   python_version: "3.6.8 (default, Nov 14 2023, 16:29:52) \n[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)]",
   log_file_size: 1,
   log_total_entries: 1,
+  error_dates: {
+    "WARN": "2024-01-08T12:50:16.006485",
+    "ERROR": "2024-01-14T19:54:12.949Z",
+    "FATAL": null
+  },
   log_levels_count: {
     WARN: 20,
     INFO: 20,
@@ -88,12 +93,12 @@ export default function Summaries() {
 
     fetchData();
   }, []);
-
-
+console.log('raw data:',data)
+  console.log("error dates (summaries):",data.error_dates)
 
   return (
     <div className='flex flex-col items-center'>
-    <ServerSummary data={data.python_version} />
+    <ServerSummary data={data.python_version} errorDates={data.error_dates} />
     <ServerSettings />
       <div className="flex flex-wrap justify-center w-5/6 ">
       <LogChart data={data} className="m-4" />

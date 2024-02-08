@@ -12,7 +12,7 @@ import Chart from 'react-apexcharts'
 
 export default function VisitorChart({ data }) {
   const dropdownRef = useRef(null);
-  console.log(data)
+  //console.log(data)
 
 
   const [chartData, setChartData] = useState({
