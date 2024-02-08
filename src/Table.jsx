@@ -212,6 +212,7 @@ export default function Ourdata() {
     'Linux x86_64': '<i class="fa-brands fa-linux fa-lg"></i>',
     'Linux armv81': '<i class="fa-brands fa-android fa-lg"></i>',
     'Linux armv8l': '<i class="fa-brands fa-android fa-lg"></i>',
+    'Linux armv6l': '<i class="devicon-raspberrypi-plain"></i>',
 
     Desktop: '<i class="fa-solid fa-laptop fa-lg"></i>',
     Mobile: ' ',
