@@ -372,9 +372,7 @@ export default function Ourdata() {
             <Table.HeadCell>Log Message</Table.HeadCell>
             <Table.HeadCell>User ID</Table.HeadCell>
             <Table.HeadCell>Environment</Table.HeadCell>
-            <Table.HeadCell>
-              <span className="sr-only">Edit</span>
-            </Table.HeadCell>
+            <Table.HeadCell>Actions</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y ">
             {currentVisibleItems.slice().map((row, rowIndex) => (
@@ -382,7 +380,7 @@ export default function Ourdata() {
                 key={rowIndex}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
-                <Table.Cell>{rowIndex + 1 }</Table.Cell>
+                <Table.Cell className="text-right">{rowIndex + 1 }</Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {humanReadableDate(row.date)}
                 </Table.Cell>
