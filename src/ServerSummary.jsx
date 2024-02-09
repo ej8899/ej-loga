@@ -7,7 +7,7 @@ import version from './version.json';
 // set this to monitor # of hours in the log to watch for any cautionary items
 const HOURS_FOR_WARNINGS = 12;
 
-// TODO - if warnings within 24hours - change button to orange w. CAUTION
+
 
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
@@ -23,7 +23,7 @@ const formattedBuild = formatTimestamp(version.buildDate);
 export default function ServerSummary({data, errorDates}) {
   const [pythonVersion, osInfo] = data.split('\n');
   
-console.log('errorDates via props:',errorDates)
+  // console.log('errorDates via props:',errorDates)
   // check for any server errors/warnings/fatals and update server status accordingly
   const hasWarning = Object.values(errorDates).some(date => {
     if (date) {
