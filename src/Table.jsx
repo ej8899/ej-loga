@@ -13,7 +13,24 @@ import logger from './logger';
 
 // TODO - colorize log messages based on type INFO, ERROR, FATAL etc.
 
+function humanReadableDate(dateString) {
+  const date = new Date(dateString);
 
+  // Format the date and time with options using Intl.DateTimeFormat
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    timeZone: "UTC"  // Specify UTC to avoid local conversions
+  };
+
+  const formatter = new Intl.DateTimeFormat("en-US", options);
+  const formattedDate = formatter.format(date);
+
+  return formattedDate+' (Z)';
+}
 
 export default function Ourdata() {
   const [jsonData, setJsonData] = useState(null);
@@ -367,7 +384,7 @@ export default function Ourdata() {
               >
                 <Table.Cell>{rowIndex + 1 }</Table.Cell>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {row.date}
+                  {humanReadableDate(row.date)}
                 </Table.Cell>
                 <Table.Cell>{renderPill(row.log)}</Table.Cell>
                 <Table.Cell 
