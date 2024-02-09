@@ -93,8 +93,8 @@ export default function Summaries() {
 
     fetchData();
   }, []);
-console.log('raw data:',data)
-  console.log("error dates (summaries):",data.error_dates)
+  // console.log('raw data:',data)
+  // console.log("error dates (summaries):",data.error_dates)
 
   return (
     <div className='flex flex-col items-center'>
