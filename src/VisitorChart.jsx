@@ -133,10 +133,12 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
     const counts = Object.values(dateCounts);
   
     const n = count;
-    const startIndex = dates.length - count;
+    const startIndex = Math.max(0, dates.length - count); // Adjust start index if insufficient data
     const endIndex = dates.length;
     const selectedDates = dates.slice(startIndex, endIndex);
     const selectedCounts = counts.slice(startIndex, endIndex);
+  
+    const trendlineData = [];
   
     const sumX = selectedDates.reduce((acc, date, index) => acc + index, 0);
     const sumY = selectedCounts.reduce((acc, count) => acc + count, 0);
@@ -149,18 +151,21 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
     // Ensure intercept is not negative
     intercept = Math.max(0, intercept);
   
-    // Calculate offset between trendline and interactions starting points
-    const interactionsStartDate = dates[startIndex];
-    const trendlineStartDate = selectedDates[0];
-    const offset = dates.indexOf(interactionsStartDate) - selectedDates.indexOf(trendlineStartDate);
+    // Calculate trendline data
+    for (let i = 0; i < selectedDates.length; i++) {
+        trendlineData.push(Math.max(0, Math.round(slope * i + intercept)));
+    }
   
-    const trendlineData = selectedDates.map((date, index) => ({
-      x: index + offset, // Adjust x to match starting point
-      y: Math.max(0, slope * index + intercept), // Ensure y is not negative
-    }));
+    // Pad out trendline data with zeros if there is insufficient data
+    const paddingCount = count - selectedDates.length;
+    for (let i = 0; i < paddingCount; i++) {
+        trendlineData.unshift(0);
+    }
+
+    return trendlineData;
+};
+
   
-    return trendlineData.map((point) => Math.floor(point.y));
-  };
   
   
   
@@ -169,7 +174,7 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
 
   const updateChartData = (dates, visitorsData, trendlineYValues = [], trendlineItemsToShow = 7, strokeWidth = [6,2]) => {
     const slicedTrendlineYValues = trendlineYValues.slice(-trendlineItemsToShow);
-    console.log("trendline data:",slicedTrendlineYValues);
+    // console.log("trendline data:",slicedTrendlineYValues);
     setChartData((prevChartData) => ({
       ...prevChartData,
       series: [
@@ -204,7 +209,7 @@ const [trafficChange, setTrafficChange] = useState('16.3%');
       '2024-01-07',
     ];
 
-    console.log('calculing trend line')
+    // console.log('calculing trend line')
 
     setChartData((prevChartData) => ({
       ...prevChartData,
