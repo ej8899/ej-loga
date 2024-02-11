@@ -7,7 +7,8 @@ import ServerChart from './ServerChart';
 import LogChart from './LogChart';
 import ServerSummary from './ServerSummary';
 import ServerSettings from './Settings';
-import SiteTraffic from './SiteTraffic';
+import SiteMonitors from './SiteMonitors';
+
 
 //
 // stats summary API: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=stats
@@ -21,6 +22,18 @@ const defaultData = {
     "WARN": "2024-01-08T12:50:16.006485",
     "ERROR": "2024-01-14T19:54:12.949Z",
     "FATAL": null
+  },
+  site_monitors: {
+    LOGA: {
+      event_type: "ERROR",
+      message: "[ERROR] [LOGA] error fetching data",
+      date: "2024-01-14T19:54:12.949Z"
+    },
+    YTAB: {
+      event_type: "ERROR",
+      message: "[ERROR] [YTAB] wx api fail",
+      date: "2024-02-11T19:54:12.949Z"
+    },
   },
   log_levels_count: {
     WARN: 20,
@@ -100,6 +113,7 @@ export default function Summaries() {
     <div className='flex flex-col items-center'>
     <ServerSummary data={data.python_version} errorDates={data.error_dates} />
     <ServerSettings />
+    <SiteMonitors data={data} />
       <div className="flex flex-wrap justify-center w-5/6 ">
       <LogChart data={data} className="m-4" />
       
