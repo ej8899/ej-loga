@@ -128,7 +128,7 @@ export default function SiteTraffic({data}) {
     </div>
   
     <div className="" >
-      <Chart options={chartData.options} series={chartData.series} width="600" type="bar" />
+      <Chart options={chartData.options} series={chartData.series} width="320" type="bar" />
     </div>
 
   </div>

@@ -142,8 +142,8 @@ export default function ServerChart({data}) {
                 offsetY: 0,
               },
               total: {
-                showAlways: true,
-                show: true,
+                showAlways: false,
+                show: false,
                 label: "total:",
                 fontFamily: "Poppins, sans-serif",
                 color: "#1C64F2",
@@ -161,7 +161,7 @@ export default function ServerChart({data}) {
                 color: "#1C64F2",
                 offsetY:5,
                 formatter: function (value) {
-                  return value + "a"
+                  return value + "%"
                 },
               },
             },
@@ -239,8 +239,9 @@ export default function ServerChart({data}) {
       });
 
       setChartData((prevChartData) => ({ ...prevChartData, 
-        series: [ parseInt(data.environment_summary[0].Desktop/data.unique_visitors),
-                  parseInt(data.environment_summary[0].Mobile/data.unique_visitors)
+        series: [ parseInt((data.environment_summary[0].Desktop)/(parseInt(data.environment_summary[0].Desktop)+parseInt(data.environment_summary[0].Mobile))*100), 
+        
+        parseInt((data.environment_summary[0].Mobile)/(parseInt(data.environment_summary[0].Mobile)+parseInt(data.environment_summary[0].Desktop))*100),
                 ] }));
     }
   }, [data]);
