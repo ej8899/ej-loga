@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
 
 'use client';
-import { Button, Tooltip } from 'flowbite-react';
-import version from './version.json';
-
 import { useState, useEffect } from 'react';
+import { Button, Tooltip, Accordion } from 'flowbite-react';
 
 // set this to monitor # of hours in the log to watch for any cautionary items
 const HOURS_FOR_WARNINGS = 12;
@@ -34,14 +32,14 @@ export default function SiteMonitors({data}) {
     
       const updatedMonitors = { ...site_monitors };
       updatedMonitors['YTAB'] = {
-        event_type: "ERROR",
+        event_type: "WARN",
         message: "[ERROR] [YTAB] wx api fail",
         date: "2025-02-11T12:54:12.949Z"
       };
       updatedMonitors['WX-WINDSOR'] = {
-        event_type: "ERROR",
-        message: "[ERROR] [YTAB] wx api fail",
-        date: "2024-02-11T13:54:12.949Z"
+        event_type: "INFO",
+        message: "[WARN] [YTAB] wx api fail",
+        date: "2024-02-12T13:54:12.949Z"
       };
       updatedMonitors['KIOSK-private01'] = {
         event_type: "available",
@@ -59,11 +57,11 @@ export default function SiteMonitors({data}) {
         date: "2025-02-11T15:54:12.949Z"
       };
       updatedMonitors['T.NETHOST'] = {
-        event_type: "FATAL",
+        event_type: "offline",
         message: "server offline (maintenance)",
         date: "2024-04-11T16:54:12.949Z"
       };
-      updatedMonitors['LIB'] = {
+      updatedMonitors['LINKINBIO'] = {
         event_type: "available",
         message: "server offline (maintenance)",
         date: "2024-04-11T16:54:12.949Z"
@@ -78,12 +76,17 @@ export default function SiteMonitors({data}) {
         message: "server offline (maintenance)",
         date: "2024-04-11T16:54:12.949Z"
       };
+      updatedMonitors['CQUIZ'] = {
+        event_type: "offline",
+        message: "(local only)",
+        date: "2030-04-11T16:54:12.949Z"
+      };
 
       Object.keys(site_total_counts).forEach(siteCode => {
         if (!updatedMonitors.hasOwnProperty(siteCode)) {
           updatedMonitors[siteCode] = {
-            event_type: "ERROR",
-            message: "[ERROR] error fetching data",
+            event_type: "INFO",
+            message: "[INFO] operating with no errors",
             date: "2024-02-11"
           };
         }
@@ -98,27 +101,33 @@ export default function SiteMonitors({data}) {
 
   const sortedEntries = Object.entries(combinedMonitors).sort(([a], [b]) => a.localeCompare(b));
 
-
   return (
-    <div className="flex justify-center items-center w-full">
+    <div className="flex flex-col justify-center items-center w-full">
       <div className="max-w-screen-2xl w-full">
-        <div className="flex flex-col  justify-between rounded-xl shadow-lg p-4 border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white m-1">
-          <div className="text-lg text-gray-900 dark:text-white pb-2">Site Monitors...</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            
-          {sortedEntries.map(([siteCode, monitorData]) => (
-              <SiteMonitorListItem
-                key={siteCode}
-                siteCode={siteCode}
-                event_type={monitorData.event_type}
-                message={monitorData.message}
-                date={monitorData.date}
-                availability={calculateAvailability(monitorData.date)}
-              />
-            ))}
-            
+      <Accordion  className="flex flex-col rounded-xl p-2 shadow-lg border border-slate-600 rounded-xl shadow-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white m-1">
+      <Accordion.Panel className='bg-white dark:bg-gray-800 p-0 m-0'>
+        <Accordion.Title className='p-2'>
+          <div className="text-lg text-gray-900 dark:text-white ">Site Monitors...</div>
+        </Accordion.Title>
+        <Accordion.Content className="dark:bg-grey p-2 pt-4 m-0">
+          <div className="flex flex-row gap-4 w-full m-0 p-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+              {sortedEntries.map(([siteCode, monitorData]) => (
+                <SiteMonitorListItem
+                  key={siteCode}
+                  siteCode={siteCode}
+                  event_type={monitorData.event_type}
+                  message={monitorData.message}
+                  date={monitorData.date}
+                  availability={calculateAvailability(monitorData.event_type, monitorData.date)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        </Accordion.Content>
+      </Accordion.Panel>
+      </Accordion>
+  
       </div>
     </div>
   );
@@ -126,33 +135,27 @@ export default function SiteMonitors({data}) {
 
 
 function SiteMonitorListItem({ siteCode, event_type, message, date, availability }) {
-  // const availabilityStatus = availability ? 'available' : 'errors';
-  // const availabilityClass = availability
-  //   ? 'bg-green-300 text-green-800 dark:bg-green-900 dark:text-green-300'
-  //   : 'bg-orange-300 text-orange-800 dark:bg-orange-600 dark:text-orange-300';
-
-  // const availabilityIconClass = availability ? 'bg-green-500' : 'bg-orange-500';
-
+  const strippedMessage = message.replace(/\[(.*?)\]/g, '');
   let availabilityStatus = '';
   let availabilityClass = '';
   let availabilityIconClass = '';
 
   // Set availability status, class, and icon class based on prop
-  if ((event_type === 'WARN' || event_type === 'FATAL' || event_type === 'ERROR') && availability === 'errors') {
-    availabilityStatus = 'Errors';
+  if ((event_type === 'FATAL' || event_type === 'ERROR') && availability === 'errors') {
+    availabilityStatus = 'Error';
     availabilityClass = 'bg-red-300 text-yellow-800 dark:bg-red-900 dark:text-yellow-300';
     availabilityIconClass = 'bg-red-500';
-  } else if ((event_type === 'WARN' || event_type === 'FATAL' || event_type === 'ERROR') && availability === 'warnings') {
-    availabilityStatus = 'Warnings';
+  } else if ((event_type === 'WARN') && (availability === 'warnings' || availability === 'errors')) {
+    availabilityStatus = 'Warning';
     availabilityClass = 'bg-orange-200 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
     availabilityIconClass = 'bg-orange-500';
-  } else if (availability === 'available') {
-    availabilityStatus = 'Available';
-    availabilityClass = 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-300';
-    availabilityIconClass = 'bg-green-500';
+  } else if (availability === 'offline') {
+    availabilityStatus = 'offline';
+    availabilityClass = 'bg-slate-200 text-slate-800 dark:bg-slate-900 dark:text-slate-300';
+    availabilityIconClass = 'bg-slate-500';
   } else {
     // Default to unknown state if none of the conditions are met
-    availabilityStatus = 'available';
+    availabilityStatus = 'Available';
     availabilityClass = 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-300';
     availabilityIconClass = 'bg-green-500';
   }
@@ -160,26 +163,37 @@ function SiteMonitorListItem({ siteCode, event_type, message, date, availability
 
 
   return (
-    <li className="py-3 sm:py-4 flex items-center space-x-3 rtl:space-x-reverse p-2 border border-slate-600 rounded-xl shadow-lg">
-      <div className="flex-1 min-w-0">
+    <div className="py-3 sm:py-4 flex items-center space-x-3 rtl:space-x-reverse p-2 border border-slate-600 rounded-xl shadow-lg">
+      <div className="flex-1 min-w-0 border-0">
         <p className="text-sm font-semibold text-gray-900 truncate dark:text-white">
           {siteCode}
         </p>
-        {(event_type === 'WARN' || event_type === 'FATAL' || event_type === 'ERROR') &&
+        {(['ERROR', 'WARN', 'FATAL'].includes(event_type) && (availability === 'errors' || availability === 'warnings')) || availability === 'offline' ?
+        (
           <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-            {message}
+            {strippedMessage}
           </p>
-        }
+        ) : (
+          <p className="text-sm text-gray-500 truncate dark:text-gray-400">
+            status all normal
+          </p>
+        )
+      }
+
       </div>
       <span className={`inline-flex items-center ${availabilityClass} text-xs font-medium px-2.5 py-0.5 rounded-full uppercase`}>
         <span className={`w-2 h-2 me-2 ${availabilityIconClass} rounded-full`}></span>
         {availabilityStatus}
       </span>
-    </li>
+    </div>
   );
 }
 
-function calculateAvailability(monitorDate) {
+function calculateAvailability(event_type, monitorDate) {
+  if (event_type === 'offline') {
+    return 'offline';
+  }
+
   const currentTime = new Date();
   const monitorTime = new Date(monitorDate);
   const timeDifference = (currentTime - monitorTime) / (1000 * 60 * 60); // Difference in hours
