@@ -219,24 +219,23 @@ export default function ServerChart({data}) {
   useEffect(() => {
     if (data) {
       // Extract the required data for the chart
-      const seriesData = data.environment_summary[2];
+ 
       
+      // const browsers = Object.keys(seriesData);
       
-      const browsers = Object.keys(seriesData);
-      
-      setBrowserBarData({
-        options: {
-          ...barBrowserData.options,
-          xaxis: {
-            ...barBrowserData.options.xaxis,
-            categories: ["web browser:"],
-          },
-          series: browsers.map((browser) => ({
-            name: browser,
-            data: [seriesData[browser]],
-          })),
-        },
-      });
+      // setBrowserBarData({
+      //   options: {
+      //     ...barBrowserData.options,
+      //     xaxis: {
+      //       ...barBrowserData.options.xaxis,
+      //       categories: ["web browser:"],
+      //     },
+      //     series: browsers.map((browser) => ({
+      //       name: browser,
+      //       data: [seriesData[browser]],
+      //     })),
+      //   },
+      // });
 
       setChartData((prevChartData) => ({ ...prevChartData, 
         series: [ parseInt((data.environment_summary[0].Desktop)/(parseInt(data.environment_summary[0].Desktop)+parseInt(data.environment_summary[0].Mobile))*100), 
@@ -277,7 +276,7 @@ export default function ServerChart({data}) {
   
     <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
     <div style={{ height: '40px', marginLeft: '-10px', marginTop: '-110px' }}>
-      <Chart options={barBrowserData.options} series={barBrowserData.options.series} type="bar" width="320" />
+      {/* <Chart options={barBrowserData.options} series={barBrowserData.options.series} type="bar" width="320" /> */}
     </div>
     </div>
   </div>
