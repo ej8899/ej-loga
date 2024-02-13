@@ -2,12 +2,15 @@
 
 'use client';
 import  { useState, useEffect } from 'react';
+import { Button, Modal } from 'flowbite-react';
 import Chart from 'react-apexcharts'
 import IconExpand from './IconExpand';
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
 export default function ServerChart({data}) {
+  const [openModal, setOpenModal] = useState(false);
+
   const [barBrowserData, setBrowserBarData] = useState({
     options: {
       chart: {
@@ -264,7 +267,21 @@ export default function ServerChart({data}) {
     dataLabels: {
       enabled: false
     },
+    annotations: {
+      label: {
+        style: {
+          fillColor: 'orange',
+          borderColor: 'orange',  
+        }
+        
+      },
+      fillColor: 'orange',
+      borderColor: 'orange',
+    },
     grid: {
+      show: true,
+      strokeDashArray: 3,
+      borderColor: 'slategray',
       xaxis: {
         lines: {
           show: true
@@ -278,12 +295,30 @@ export default function ServerChart({data}) {
     },
     xaxis: {
       type: 'datetime',
+      labels: {
+        show: true,
+        style: {
+            colors: "#0e81df"
+        }
+      },
     },
     yaxis: {
       max: 100,
-      min: 0
+      min: 0,
+      labels: {
+        style: {
+            colors: "#0e81df"
+        }
+      },
+    },
+    legend: {
+      show: true,
+      labels: {
+        colors: 'slategray'
+      }
     }
   },
+
 });
 
 
@@ -389,7 +424,7 @@ useEffect(() => {
         <div>
         <button 
             type="button"
-            onClick={() => downloadCSV(data.date_counts)}
+            onClick={() => setOpenModal(true)}
             data-tooltip-target="data-tooltip"
             data-tooltip-placement="bottom" 
             className="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm">
@@ -403,6 +438,23 @@ useEffect(() => {
     {/* <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
 
     </div> */}
+
+      <Modal dismissible size='4xl' show={openModal} onClose={() => setOpenModal(false)}>
+        <Modal.Header>Traffic Overview (per site/app)</Modal.Header>
+        <Modal.Body>
+          <div className="flex flex-col items-center space-y-6 justify-center">
+            {/* <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+              With less than a month to go before the European Union enacts new consumer privacy laws for its citizens,
+              companies around the world are updating their terms of service agreements to comply.
+            </p> */}
+            <Chart className="dark:background-gray-500 border-2 border-slate-400 dark:border-slate-500 rounded-xl p-6" options={clickData.options} series={clickData.series} type="scatter" height={420} width={700} />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          
+        </Modal.Footer>
+      </Modal>
+
   </div>
   );
 }
@@ -422,33 +474,5 @@ function generateDayWiseTimeSeries(startTime, count, options) {
     i++;
   }
   // console.log(series);
-  return series;
-}
-
-function generateSeriesData(sourceData) {
-  const seriesData = {};
-
-  // Loop through the source data
-  sourceData.forEach(entry => {
-    // Extract SITESHORTCODE from log
-    const logParts = entry.log.split(' ');
-    const SITESHORTCODE = logParts[logParts.indexOf('[') + 1];
-
-    // Convert date timestamp to the required format
-    const timestamp = new Date(entry.date).getTime();
-
-    // Add data to seriesData object
-    if (!seriesData[SITESHORTCODE]) {
-      seriesData[SITESHORTCODE] = [];
-    }
-    seriesData[SITESHORTCODE].push([timestamp, 1]); // Assuming count is always 1
-  });
-
-  // Convert seriesData object to array of objects
-  const series = Object.keys(seriesData).map(key => ({
-    name: key,
-    data: seriesData[key]
-  }));
-
   return series;
 }
