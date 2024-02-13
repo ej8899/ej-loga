@@ -3,6 +3,7 @@
 'use client';
 import  { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts'
+import IconExpand from './IconExpand';
 // grab ALL data URL: https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=all
 
 
@@ -208,18 +209,136 @@ export default function ServerChart({data}) {
     },
   });
 
+  const [clickData,setClickData] = useState({
+    series: [{
+      name: 'SITESHORTCODE',
+      data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 20, {
+        min: 10,
+        max: 60
+      })
+    },
+    {
+      name: 'TEAM 2',
+      data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 20, {
+        min: 10,
+        max: 60
+      })
+    },
+    {
+      name: 'TEAM 3',
+      data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 30, {
+        min: 10,
+        max: 60
+      })
+    },
+    {
+      name: 'TEAM 4',
+      data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 10, {
+        min: 10,
+        max: 60
+      })
+    },
+  ],
+  options: {
+    "markers": {
+      "size": 5,
+      "strokeWidth": 0,
+      "hover": {
+          "size": 10,
+          "sizeOffset": 2
+      }
+    },
+    chart: {
+      height: 350,
+      type: 'scatter',
+      zoom: {
+        type: 'xy'
+      },
+      // zoom: {
+      //   enabled: false,
+      // },
+      toolbar: {
+        show: true
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    grid: {
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      },
+    },
+    xaxis: {
+      type: 'datetime',
+    },
+    yaxis: {
+      max: 100,
+      min: 0
+    }
+  },
+});
 
 
-  // useEffect(() => {
-  //   // TODO fetch our summary data and update here
-  //   const newSeries = [40, 50, 30, 710,23,12];
-  //   setChartData((prevChartData) => ({ ...prevChartData, series: newSeries }));
-  // }, []);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch('https://erniejohnson.ca/cgi-bin/log.py?action=fetch&fetch=daily');
+
+      if (response.ok) {
+        const jsonData = await response.json();
+
+        // Format the fetched data into the required series format
+        const formattedData = jsonData.map(entry => ({
+          name: entry.name,
+          data: entry.data.map(item => [(item[0]), item[1]])
+        }));
+
+        // Calculate y-axis max value based on mean + 3 * standard deviation
+        const allDataPoints = formattedData.flatMap(entry => entry.data.map(item => item[1]));
+        const mean = allDataPoints.reduce((acc, val) => acc + val, 0) / allDataPoints.length;
+        const variance = allDataPoints.reduce((acc, val) => acc + (val - mean) ** 2, 0) / allDataPoints.length;
+        const stdDeviation = Math.sqrt(variance);
+        const yAxisMax = mean + 1 * stdDeviation;
+
+        // Update the state with the fetched data
+        setClickData({
+          ...clickData,
+          series: formattedData
+        });
+        setClickData(prevState => ({
+          ...prevState,
+          options: {
+            ...prevState.options,
+            yaxis: {
+              ...prevState.options.yaxis,
+              max: yAxisMax
+            }
+          }
+        }));
+        console.log('yaxismax:',yAxisMax)
+        console.log('new click data:',clickData)
+      } else {
+        console.error('Failed to fetch data:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    }
+  };
+
+  fetchData();
+}, []);
 
   useEffect(() => {
     if (data) {
       // Extract the required data for the chart
- 
       
       // const browsers = Object.keys(seriesData);
       
@@ -250,7 +369,7 @@ export default function ServerChart({data}) {
   
     <div className="flex justify-between mb-3">
         <div className="flex justify-center items-center">
-            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">User Device</h5>
+            <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Traffic Overview</h5>
             <svg data-popover-target="chart-info" data-popover-placement="bottom" className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
             </svg>
@@ -268,17 +387,68 @@ export default function ServerChart({data}) {
             </div>
           </div>
         <div>
-          &nbsp;
+        <button 
+            type="button"
+            onClick={() => downloadCSV(data.date_counts)}
+            data-tooltip-target="data-tooltip"
+            data-tooltip-placement="bottom" 
+            className="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm">
+          <IconExpand />
+        </button>
         </div>
     </div>
   
-    <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
-  
-    <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
-    <div style={{ height: '40px', marginLeft: '-10px', marginTop: '-110px' }}>
-      {/* <Chart options={barBrowserData.options} series={barBrowserData.options.series} type="bar" width="320" /> */}
-    </div>
-    </div>
+    {/* <Chart options={chartData.options} series={chartData.series} type="donut" width="320" /> */}
+    <Chart options={clickData.options} series={clickData.series} type="scatter" height={280} width={320} />
+    {/* <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
+
+    </div> */}
   </div>
   );
+}
+
+
+function generateDayWiseTimeSeries(startTime, count, options) {
+  const { min, max } = options;
+  var series = [];
+  let i =0;
+  while (i < count) {
+    var x = startTime;
+    var y =
+      Math.floor(Math.random() * (max - min + 1)) + min;
+
+    series.push([x, y]);
+    startTime += 86400000;
+    i++;
+  }
+  // console.log(series);
+  return series;
+}
+
+function generateSeriesData(sourceData) {
+  const seriesData = {};
+
+  // Loop through the source data
+  sourceData.forEach(entry => {
+    // Extract SITESHORTCODE from log
+    const logParts = entry.log.split(' ');
+    const SITESHORTCODE = logParts[logParts.indexOf('[') + 1];
+
+    // Convert date timestamp to the required format
+    const timestamp = new Date(entry.date).getTime();
+
+    // Add data to seriesData object
+    if (!seriesData[SITESHORTCODE]) {
+      seriesData[SITESHORTCODE] = [];
+    }
+    seriesData[SITESHORTCODE].push([timestamp, 1]); // Assuming count is always 1
+  });
+
+  // Convert seriesData object to array of objects
+  const series = Object.keys(seriesData).map(key => ({
+    name: key,
+    data: seriesData[key]
+  }));
+
+  return series;
 }
