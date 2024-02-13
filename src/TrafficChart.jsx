@@ -109,6 +109,108 @@ export default function TrafficChart({ data }) {
     },
   });
 
+  const [barBrowserData, setBrowserBarData] = useState({
+    options: {
+      chart: {
+        stacked: true,
+        stackType: "100%",
+        type: 'bar',
+        toolbar: {
+          show: false
+        },
+        margin: 0,
+        height: 550,
+        
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          // borderRadiusApplication: "around",
+          // borderRadiusWhenStacked: 'all',
+          // borderRadius: 6,
+          barHeight: '20%'
+        },
+        ticks: {
+          position: 'top',
+          show: false
+        },
+      },
+      xaxis: {
+        //categories: ['category A', ]
+        labels: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        },
+        lines: {
+          show: false,
+        },
+        ticks: {
+          show: false
+        },
+        grid: {
+          show: false,
+        },
+        axisTicks: {
+          show: false // Add this to hide the x-axis ticks
+        },
+        categories: ["web browser: "],
+        tooltip: {
+          enabled: true,
+          fillSeriesColor: false,
+          // color: 'red',
+          // style: {
+          //   color: 'red',
+          // },
+          x: {
+            color: 'yellow',
+            show: false,
+          },
+          onDatasetHover: {
+            highlightDataSeries: false,
+        }
+        },
+      },
+      yaxis: {
+        labels: {
+          show: false
+        },
+        lines: {
+          show: false,
+        },
+      },
+      series: [
+        {
+          name: 'Chrome',
+          data: [4]
+        },
+        {
+          name: 'Firefox',
+          data: [2]
+        },
+        {
+          name: 'Safari',
+          data: [3]
+        },
+        {
+          name: 'Other',
+          data: [1],
+        }
+        // Add more series as needed
+      ],
+      legend: {
+        show: false,
+      },
+      grid: {
+        show: false,
+      },
+      ticks: {
+        show: false,
+      },
+    }
+  });
+
   const [siteData, setSiteData] = useState({
     series: [
       {
@@ -225,7 +327,24 @@ export default function TrafficChart({ data }) {
   };
 
   useEffect(() => {
-    // Process incoming data and update chart
+    // Process incoming data and update charset
+
+    const seriesData = data.environment_summary[2];
+    const browsers = Object.keys(seriesData);
+    setBrowserBarData({
+      options: {
+        ...barBrowserData.options,
+        xaxis: {
+          ...barBrowserData.options.xaxis,
+          categories: ["web browser:"],
+        },
+        series: browsers.map((browser) => ({
+          name: browser,
+          data: [seriesData[browser]],
+        })),
+      },
+    });
+
     if (data && data.environment_summary && data.log_total_entries && data.unique_visitors) {
       const processedData = processEnvironmentSummary(data.environment_summary[1], data.log_total_entries, data.unique_visitors);
       setChartData((prevChartData) => ({ ...prevChartData, series: processedData }));
@@ -250,9 +369,11 @@ export default function TrafficChart({ data }) {
       <Chart options={chartData.options} series={chartData.series} type="donut" width="320" />
       {/* <Chart options={siteData.options} series={siteData.series} width="320" type="bar" /> */}
 
-      <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-4">
-        &nbsp;
-      </div>
+      <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mb-10">
+    <div style={{ height: '40px', marginLeft: '-10px', marginTop: '-110px' }}>
+      <Chart options={barBrowserData.options} series={barBrowserData.options.series} type="bar" width="320" />
+    </div>
+    </div>
     </div>
   );
 }
