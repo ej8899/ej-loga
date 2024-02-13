@@ -114,7 +114,7 @@ export default function Summaries() {
     <ServerSummary data={data.python_version} errorDates={data.error_dates} />
     <ServerSettings />
     <SiteMonitors data={data} />
-      <div className="flex flex-wrap justify-center w-5/6 ">
+      <div className="flex flex-wrap justify-center w-full ">
       <LogChart data={data} className="m-4" />
       
       <ServerChart data={data} className="m-4" />
