@@ -113,6 +113,8 @@ export default function Ourdata() {
     }
   }, [jsonData]);
 
+
+  
   // useEffect(() => {
   //   // Trigger load more when filteredData changes
   //   //handleLoadMore();
@@ -282,6 +284,7 @@ export default function Ourdata() {
     for (const [messageType, style] of Object.entries(messageTypeStyles)) {
       if (logMessage.includes(messageType)) {
         cleanedMessage = cleanedMessage.replace(messageType, '');
+        cleanedMessage = cleanedMessage.replace(/\[.*?\]/, '');
         return `<span class='${style}'>${cleanedMessage}</span>`;
       }
     }
@@ -314,6 +317,58 @@ export default function Ourdata() {
       <span className={`uppercase ${style}`}>{text}</span>
     );
   };
+
+  //
+  // render 'pills' to show each site
+  //
+  let siteStyles = {};
+  const renderSitePill = (log) => {
+    const match = log.match(/\[.*?\] \[(.*?)\]/); // Extracting text within the second set of square brackets
+    let siteName = "";
+    if (match && match.length > 1) {
+        siteName = match[1];
+    }
+
+    let style = '';
+
+    // If site name is found, check if it has a style assigned
+    if (siteName && siteStyles.hasOwnProperty(siteName)) {
+        style = siteStyles[siteName];
+    } else {
+        // Generate a color based on hashing the site name
+        const hash = hashCode(siteName);
+        const color = intToTailwindColor(hash);
+        style = `bg-${color}-100 text-${color}-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-${color}-900 dark:text-${color}-300`;
+
+        // Update the siteStyles mapping
+        if (siteName) {
+            siteStyles[siteName] = style;
+        }
+    }
+
+    return (
+        <span className={`uppercase ${style} whitespace-nowrap`}>{siteName}</span>
+    );
+};
+// Function to generate a hash code for a string
+const hashCode = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return hash;
+};
+
+// Function to convert an integer to a Tailwind CSS color
+const intToTailwindColor = (i) => {
+  const colors = [
+      'red', 'yellow', 'green', 'blue', 'indigo', 'purple', 'pink', 'gray'
+  ];
+
+  // Take absolute value to handle negative hash codes
+  const index = Math.abs(i) % colors.length;
+  return colors[index];
+};
   
   // const isEndOfFile = visibleItems >= filteredData.length;
 
@@ -369,6 +424,7 @@ export default function Ourdata() {
             <Table.HeadCell>Row</Table.HeadCell>
             <Table.HeadCell>Date</Table.HeadCell>
             <Table.HeadCell>Type</Table.HeadCell>
+            <Table.HeadCell>Site</Table.HeadCell>
             <Table.HeadCell>Log Message</Table.HeadCell>
             <Table.HeadCell>User ID</Table.HeadCell>
             <Table.HeadCell>Environment</Table.HeadCell>
@@ -385,6 +441,7 @@ export default function Ourdata() {
                   {humanReadableDate(row.date)}
                 </Table.Cell>
                 <Table.Cell>{renderPill(row.log)}</Table.Cell>
+                <Table.Cell>{renderSitePill(row.log)}</Table.Cell>
                 <Table.Cell 
                   className="w-full"
                   dangerouslySetInnerHTML={{ __html: cleanLogMessage(row.log) }} 

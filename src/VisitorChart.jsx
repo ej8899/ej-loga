@@ -33,7 +33,7 @@ export default function VisitorChart({ data }) {
           enabled: false,
         },
         toolbar: {
-          show: false,
+          show: true,
         },
       },
       dataLabels: {
@@ -56,8 +56,9 @@ export default function VisitorChart({ data }) {
         },
       },
       grid: {
-        show: false,
+        show: true,
         strokeDashArray: 4,
+        borderColor: 'slategray',
         padding: {
           left: 2,
           right: 2,
@@ -70,7 +71,7 @@ export default function VisitorChart({ data }) {
           fontSize: "14px",
         },
         stroke: {
-          color: "#FFA500",
+          color: "",
         },
         labels: {
           color: "#fff",

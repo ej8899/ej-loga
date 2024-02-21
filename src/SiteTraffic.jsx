@@ -24,6 +24,14 @@ export default function SiteTraffic({data}) {
     },
     
     options: {
+      legend: {
+        show: true,
+        position: "bottom",
+        labels: {
+          colors: 'slategray'
+        }
+      },
+      
       plotOptions: {
         bar: {
           horizontal: false,
@@ -45,11 +53,6 @@ export default function SiteTraffic({data}) {
 
       fill: {
         opacity: 0.7
-      },
-
-      legend: {
-        show: false,
-        position: "bottom",
       },
 
       tooltip: {

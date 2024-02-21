@@ -39,6 +39,7 @@ export default function ServerSettings({ data }) {
         <Accordion.Content className="dark:bg-grey" >
           <div className="flex flex-row gap-4 w-full">
             <table>
+              <tbody>
               <tr>
                 <td className='p-2'>Local Settings...</td>
                 <td>
@@ -55,6 +56,7 @@ export default function ServerSettings({ data }) {
                   </label>
                 </td>
               </tr>
+
               <tr>
                 <td className='p-2'>Admin Settings...</td>
                 <td>
@@ -83,6 +85,7 @@ export default function ServerSettings({ data }) {
                   </label>   
                 </td>
               </tr>
+
               <tr>
                 <td className='p-2 pr-8'>Server Admin Settings...</td>
                 <td>
@@ -99,6 +102,7 @@ export default function ServerSettings({ data }) {
                   </label>
                 </td>
               </tr>
+            </tbody>
             </table>
                       
             </div>

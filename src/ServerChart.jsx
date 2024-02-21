@@ -251,6 +251,7 @@ export default function ServerChart({data}) {
           "sizeOffset": 2
       }
     },
+    
     chart: {
       height: 350,
       type: 'scatter',
@@ -358,8 +359,8 @@ useEffect(() => {
             }
           }
         }));
-        console.log('yaxismax:',yAxisMax)
-        console.log('new click data:',clickData)
+        // console.log('yaxismax:',yAxisMax)
+        // console.log('new click data:',clickData)
       } else {
         console.error('Failed to fetch data:', response.statusText);
       }
